@@ -191,7 +191,7 @@ const AdminConfig = () => {
         </div>
       </CardBox>
 
-      <Toast toast={toast} onClose={hideToast} />
+      <Toast message={toast.message} type={toast.type} show={toast.show} onClose={hideToast} />
     </div>
   );
 };

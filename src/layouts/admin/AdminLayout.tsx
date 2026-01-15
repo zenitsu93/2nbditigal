@@ -44,7 +44,7 @@ const AdminLayout: FC = () => {
                     active={isActive}
                     icon={() => <Icon icon={item.icon} className="w-5 h-5" />}
                     as={Link}
-                    to={item.path}
+                    {...({ to: item.path } as any)}
                   >
                     {item.label}
                   </SidebarItem>
@@ -59,7 +59,7 @@ const AdminLayout: FC = () => {
               <SidebarItem
                 icon={() => <Icon icon="solar:home-2-line-duotone" className="w-5 h-5" />}
                 as={Link}
-                to="/"
+                {...({ to: "/" } as any)}
               >
                 Retour au site
               </SidebarItem>
