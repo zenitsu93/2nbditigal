@@ -1,0 +1,106 @@
+@import 'tailwindcss';
+@import './layouts/container.css' layer(base);
+@import './layouts/sidebar.css';
+@import './layouts/header.css' layer(base);
+@import './override/reboot.css' layer(base);
+
+
+@plugin 'flowbite-react/plugin/tailwindcss';
+@source '../../.flowbite-react/class-list.json';
+@source '../../node_modules/flowbite-react/dist/esm/**/*.mjs';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+
+  --font-*: initial;
+  --font-sans: "Poppins", sans-serif;
+
+  /* Palette 2NB Digital - Bleu foncé (navy) et Jaune doré (gold) */
+  --color-primary: oklch(0.35 0.08 250); /* Bleu foncé navy #1a2b5c */
+  --color-secondary: oklch(0.75 0.12 85); /* Jaune doré #d4af37 */
+  --color-info: oklch(0.55 0.10 240); /* Bleu moyen pour info */
+  --color-success: oklch(0.7676 0.1533 156.87);
+  --color-warning: oklch(0.78 0.13 80); /* Jaune doré plus clair pour warning */
+  --color-error: oklch(0.7745 0.1265 35.41);
+  --color-indigo: oklch(0.45 0.09 260); /* Bleu indigo adapté */
+  --color-dark: oklch(0.23 0.037 258.85);
+
+  --shadow-md: 0 2px 6px #2553b91a;
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+
+  --radius-sm: 7px;
+  --radius-md: 9px;
+  --radius-lg: 18px;
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility container {
+  @apply max-w-[1300px];
+}
+
+@utility sidebar-link {
+  @apply !h-12 !rounded-full !rounded-s-none text-sm !font-medium
+}
+
+@utility dropdown {
+  @apply shadow-md bg-white dark:bg-dark relative rounded-sm;
+}
+
+@utility card-title {
+  @apply text-lg font-semibold text-dark dark:text-white;
+}
+
+@utility sidebar-dropdown {
+  & .drop-items{
+    @apply text-dark/60 dark:text-white/50 group-hover/link:text-dark dark:group-hover/link:text-white;
+  }
+}
+
+@utility form-control {
+  & input {
+    @apply border border-gray-300 bg-transparent w-full text-sm rounded-sm;
+  }
+
+  & input:focus {
+    @apply border-primary outline-hidden shadow-none ring-offset-0 ring-transparent;
+  }
+}
+
+
+
+@layer components {
+
+  button {
+    @apply !cursor-pointer;
+  }
+
+  /*heading text color*/
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-dark dark:text-white font-semibold;
+  }
+
+
+}
+
