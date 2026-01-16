@@ -1,16 +1,18 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
+import { cacheMiddleware, invalidateCache } from '../middleware/cache.js';
 import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET all partners
-router.get('/', async (req, res) => {
+// GET all partners avec cache (partenaires changent rarement)
+router.get('/', cacheMiddleware(15 * 60 * 1000), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('partners')
-      .select('*')
-      .order('createdAt', { ascending: false });
+      .select('id, name, logo, website, createdAt, updatedAt')
+      .order('createdAt', { ascending: false })
+      .limit(100); // Limite raisonnable
 
     if (error) throw error;
     res.json(data || []);
@@ -20,8 +22,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET partner by ID
-router.get('/:id', async (req, res) => {
+// GET partner by ID avec cache
+router.get('/:id', cacheMiddleware(15 * 60 * 1000), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { data, error } = await supabase
@@ -73,6 +75,9 @@ router.post('/', authenticateToken, async (req, res) => {
       throw error;
     }
 
+    // Invalider le cache des partenaires
+    invalidateCache('/api/partners');
+    
     res.status(201).json(data);
   } catch (error) {
     console.error('Error creating partner:', error);
@@ -105,6 +110,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
       throw error;
     }
 
+    // Invalider le cache des partenaires
+    invalidateCache('/api/partners');
+    invalidateCache(`/api/partners/${id}`);
+
     res.json(data);
   } catch (error) {
     console.error('Error updating partner:', error);
@@ -123,6 +132,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       .eq('id', id);
 
     if (error) throw error;
+
+    // Invalider le cache des partenaires
+    invalidateCache('/api/partners');
+    invalidateCache(`/api/partners/${id}`);
 
     res.status(204).send();
   } catch (error) {

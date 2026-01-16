@@ -1,33 +1,52 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
+import { cacheMiddleware, invalidateCache } from '../middleware/cache.js';
 import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET all projects
-router.get('/', async (req, res) => {
+// GET all projects avec pagination et cache
+router.get('/', cacheMiddleware(5 * 60 * 1000), async (req, res) => {
   try {
-    const { category } = req.query;
-    let query = supabase.from('projects').select('*');
+    const { category, limit = '50', offset = '0' } = req.query;
+    
+    // Limiter à 100 projets max par requête
+    const limitNum = Math.min(parseInt(limit) || 50, 100);
+    const offsetNum = parseInt(offset) || 0;
+    
+    let query = supabase
+      .from('projects')
+      .select('id, title, description, image, video, category, tags, date, createdAt, updatedAt', { count: 'exact' });
 
     if (category && category !== 'Tous') {
       query = query.eq('category', category);
     }
 
-    query = query.order('date', { ascending: false });
+    query = query
+      .order('date', { ascending: false })
+      .range(offsetNum, offsetNum + limitNum - 1);
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    res.json(data || []);
+    
+    res.json({
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        limit: limitNum,
+        offset: offsetNum,
+        hasMore: count ? offsetNum + limitNum < count : false
+      }
+    });
   } catch (error) {
     console.error('Error fetching projects:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET project by ID
-router.get('/:id', async (req, res) => {
+// GET project by ID avec cache
+router.get('/:id', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
     const { id } = req.params;
     const { data, error } = await supabase
@@ -77,6 +96,10 @@ router.post('/', authenticateToken, async (req, res) => {
       .single();
 
     if (error) throw error;
+    
+    // Invalider le cache des projets
+    invalidateCache('/api/projects');
+    
     res.status(201).json(data);
   } catch (error) {
     console.error('Error creating project:', error);
@@ -113,6 +136,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
       throw error;
     }
 
+    // Invalider le cache des projets
+    invalidateCache('/api/projects');
+    invalidateCache(`/api/projects/${id}`);
+
     res.json(data);
   } catch (error) {
     console.error('Error updating project:', error);
@@ -131,6 +158,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       .eq('id', id);
 
     if (error) throw error;
+
+    // Invalider le cache des projets
+    invalidateCache('/api/projects');
+    invalidateCache(`/api/projects/${id}`);
 
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {

@@ -1,16 +1,18 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
+import { cacheMiddleware, invalidateCache } from '../middleware/cache.js';
 import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET all testimonials
-router.get('/', async (req, res) => {
+// GET all testimonials avec cache
+router.get('/', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('testimonials')
-      .select('*')
-      .order('createdAt', { ascending: false });
+      .select('id, name, role, company, image, content, rating, createdAt, updatedAt')
+      .order('createdAt', { ascending: false })
+      .limit(50); // Limite raisonnable
 
     if (error) throw error;
     res.json(data || []);
@@ -20,8 +22,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET testimonial by ID
-router.get('/:id', async (req, res) => {
+// GET testimonial by ID avec cache
+router.get('/:id', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
     const { id } = req.params;
     const { data, error } = await supabase
@@ -72,6 +74,10 @@ router.post('/', authenticateToken, async (req, res) => {
       .single();
 
     if (error) throw error;
+    
+    // Invalider le cache des témoignages
+    invalidateCache('/api/testimonials');
+    
     res.status(201).json(data);
   } catch (error) {
     console.error('Error creating testimonial:', error);
@@ -109,6 +115,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
       throw error;
     }
 
+    // Invalider le cache des témoignages
+    invalidateCache('/api/testimonials');
+    invalidateCache(`/api/testimonials/${id}`);
+
     res.json(data);
   } catch (error) {
     console.error('Error updating testimonial:', error);
@@ -127,6 +137,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       .eq('id', id);
 
     if (error) throw error;
+
+    // Invalider le cache des témoignages
+    invalidateCache('/api/testimonials');
+    invalidateCache(`/api/testimonials/${id}`);
 
     res.json({ message: 'Testimonial deleted successfully' });
   } catch (error) {

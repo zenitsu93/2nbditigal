@@ -1,14 +1,22 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
+import { cacheMiddleware, invalidateCache } from '../middleware/cache.js';
 import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET all articles
-router.get('/', async (req, res) => {
+// GET all articles avec pagination et cache
+router.get('/', cacheMiddleware(5 * 60 * 1000), async (req, res) => {
   try {
-    const { published, category } = req.query;
-    let query = supabase.from('articles').select('*');
+    const { published, category, limit = '50', offset = '0' } = req.query;
+    
+    // Limiter à 100 articles max par requête
+    const limitNum = Math.min(parseInt(limit) || 50, 100);
+    const offsetNum = parseInt(offset) || 0;
+    
+    let query = supabase
+      .from('articles')
+      .select('id, title, excerpt, image, video, author, category, tags, published, date, createdAt, updatedAt', { count: 'exact' });
 
     if (published !== undefined) {
       query = query.eq('published', published === 'true');
@@ -18,20 +26,31 @@ router.get('/', async (req, res) => {
       query = query.eq('category', category);
     }
 
-    query = query.order('date', { ascending: false });
+    query = query
+      .order('date', { ascending: false })
+      .range(offsetNum, offsetNum + limitNum - 1);
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    res.json(data || []);
+    
+    res.json({
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        limit: limitNum,
+        offset: offsetNum,
+        hasMore: count ? offsetNum + limitNum < count : false
+      }
+    });
   } catch (error) {
     console.error('Error fetching articles:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// GET article by ID
-router.get('/:id', async (req, res) => {
+// GET article by ID avec cache
+router.get('/:id', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
     const { id } = req.params;
     const { data, error } = await supabase
@@ -84,6 +103,10 @@ router.post('/', authenticateToken, async (req, res) => {
       .single();
 
     if (error) throw error;
+    
+    // Invalider le cache des articles
+    invalidateCache('/api/articles');
+    
     res.status(201).json(data);
   } catch (error) {
     console.error('Error creating article:', error);
@@ -123,6 +146,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
       throw error;
     }
 
+    // Invalider le cache des articles
+    invalidateCache('/api/articles');
+    invalidateCache(`/api/articles/${id}`);
+
     res.json(data);
   } catch (error) {
     console.error('Error updating article:', error);
@@ -141,6 +168,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       .eq('id', id);
 
     if (error) throw error;
+
+    // Invalider le cache des articles
+    invalidateCache('/api/articles');
+    invalidateCache(`/api/articles/${id}`);
 
     res.json({ message: 'Article deleted successfully' });
   } catch (error) {

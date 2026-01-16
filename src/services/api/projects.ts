@@ -13,10 +13,33 @@ export interface Project {
   updatedAt: string;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
 export const projectsApi = {
-  getAll: async (category?: string): Promise<Project[]> => {
-    const query = category && category !== 'Tous' ? `?category=${encodeURIComponent(category)}` : '';
-    return apiClient.get<Project[]>(`/projects${query}`);
+  getAll: async (category?: string, limit?: number, offset?: number): Promise<Project[]> => {
+    const params = new URLSearchParams();
+    if (category && category !== 'Tous') params.append('category', category);
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+    const query = params.toString() ? `?${params.toString()}` : '';
+    
+    const response = await apiClient.get<Project[] | PaginatedResponse<Project>>(`/projects${query}`);
+    
+    // Compatibilité: si la réponse est paginée, extraire les données
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray((response as PaginatedResponse<Project>).data)) {
+      return (response as PaginatedResponse<Project>).data;
+    }
+    
+    // Sinon, retourner directement (ancien format)
+    return response as Project[];
   },
 
   getById: async (id: number): Promise<Project> => {

@@ -16,13 +16,34 @@ export interface Article {
   updatedAt: string;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
 export const articlesApi = {
-  getAll: async (published?: boolean, category?: string): Promise<Article[]> => {
+  getAll: async (published?: boolean, category?: string, limit?: number, offset?: number): Promise<Article[]> => {
     const params = new URLSearchParams();
     if (published !== undefined) params.append('published', published.toString());
     if (category) params.append('category', category);
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
     const query = params.toString() ? `?${params.toString()}` : '';
-    return apiClient.get<Article[]>(`/articles${query}`);
+    
+    const response = await apiClient.get<Article[] | PaginatedResponse<Article>>(`/articles${query}`);
+    
+    // Compatibilité: si la réponse est paginée, extraire les données
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray((response as PaginatedResponse<Article>).data)) {
+      return (response as PaginatedResponse<Article>).data;
+    }
+    
+    // Sinon, retourner directement (ancien format)
+    return response as Article[];
   },
 
   getById: async (id: number): Promise<Article> => {
