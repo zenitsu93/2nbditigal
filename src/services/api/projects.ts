@@ -14,16 +14,6 @@ export interface Project {
   updatedAt: string;
 }
 
-interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    total: number;
-    limit: number;
-    offset: number;
-    hasMore: boolean;
-  };
-}
-
 export const projectsApi = {
   getAll: async (category?: string, limit?: number, offset?: number): Promise<Project[]> => {
     const params = new URLSearchParams();
@@ -57,7 +47,7 @@ export const projectsApi = {
     return apiClient.get<Project>(`/projects/${slug}`);
   },
 
-  create: async (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> => {
+  create: async (data: Omit<Project, 'id' | 'slug' | 'createdAt' | 'updatedAt'> & { slug?: string }): Promise<Project> => {
     return apiClient.post<Project>('/projects', data);
   },
 

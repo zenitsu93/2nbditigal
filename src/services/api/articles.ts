@@ -17,16 +17,6 @@ export interface Article {
   updatedAt: string;
 }
 
-interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    total: number;
-    limit: number;
-    offset: number;
-    hasMore: boolean;
-  };
-}
-
 export const articlesApi = {
   getAll: async (published?: boolean, category?: string, limit?: number, offset?: number): Promise<Article[]> => {
     const params = new URLSearchParams();
@@ -61,7 +51,7 @@ export const articlesApi = {
     return apiClient.get<Article>(`/articles/${slug}`);
   },
 
-  create: async (data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>): Promise<Article> => {
+  create: async (data: Omit<Article, 'id' | 'slug' | 'createdAt' | 'updatedAt'> & { slug?: string }): Promise<Article> => {
     return apiClient.post<Article>('/articles', data);
   },
 
