@@ -3,6 +3,7 @@ import { apiClient } from './client';
 export interface Project {
   id: number;
   title: string;
+  slug: string;
   description: string;
   image?: string;
   video?: string;
@@ -31,19 +32,29 @@ export const projectsApi = {
     if (offset) params.append('offset', offset.toString());
     const query = params.toString() ? `?${params.toString()}` : '';
     
-    const response = await apiClient.get<Project[] | PaginatedResponse<Project>>(`/projects${query}`);
+    const response = await apiClient.get<any>(`/projects${query}`);
     
     // Compatibilité: si la réponse est paginée, extraire les données
-    if (response && typeof response === 'object' && 'data' in response && Array.isArray((response as PaginatedResponse<Project>).data)) {
-      return (response as PaginatedResponse<Project>).data;
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+      return response.data;
     }
     
-    // Sinon, retourner directement (ancien format)
-    return response as Project[];
+    // Si c'est déjà un tableau, le retourner directement
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // Sinon, retourner un tableau vide en cas d'erreur
+    console.warn('Unexpected response format from projects API:', response);
+    return [];
   },
 
   getById: async (id: number): Promise<Project> => {
     return apiClient.get<Project>(`/projects/${id}`);
+  },
+
+  getBySlug: async (slug: string): Promise<Project> => {
+    return apiClient.get<Project>(`/projects/${slug}`);
   },
 
   create: async (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> => {

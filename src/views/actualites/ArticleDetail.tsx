@@ -9,15 +9,19 @@ import remarkBreaks from 'remark-breaks';
 import { articlesApi, Article } from '../../services/api/articles';
 
 const ArticleDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        if (id) {
-          const data = await articlesApi.getById(Number(id));
+        if (slug) {
+          // Essayer d'abord avec le slug, puis avec l'ID si c'est un nombre
+          const isNumeric = /^\d+$/.test(slug);
+          const data = isNumeric 
+            ? await articlesApi.getById(Number(slug))
+            : await articlesApi.getBySlug(slug);
           setArticle(data);
         }
       } catch (error) {
@@ -27,7 +31,7 @@ const ArticleDetail = () => {
       }
     };
     fetchArticle();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-12 text-center">Chargement...</div>;

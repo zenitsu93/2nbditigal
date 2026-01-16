@@ -110,7 +110,7 @@ const Realisations = () => {
               <div className="lg:col-span-4 md:col-span-6 col-span-12" key={project.id}>
                 <CardBox className="p-0 overflow-hidden group card-hover h-full flex flex-col">
                   <div className="relative">
-                    <Link to={`/realisations/${project.id}`}>
+                    <Link to={`/realisations/${project.slug || project.id}`}>
                       <div className="overflow-hidden h-[200px] w-full">
                         <img
                           src={project.image || '/images/products/s1.jpg'}
@@ -124,7 +124,7 @@ const Realisations = () => {
                     </div>
                   </div>
                   <div className="p-6 flex-1 flex flex-col">
-                    <Link to={`/realisations/${project.id}`}>
+                    <Link to={`/realisations/${project.slug || project.id}`}>
                       <h3 className="text-xl font-semibold text-dark mb-2 group-hover:text-primary transition-colors cursor-pointer">
                         {project.title}
                       </h3>
@@ -139,7 +139,7 @@ const Realisations = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-dark/50">{new Date(project.date).toLocaleDateString('fr-FR')}</span>
-                      <Link to={`/realisations/${project.id}`}>
+                      <Link to={`/realisations/${project.slug || project.id}`}>
                         <Button color="primary" size="sm">
                           Voir plus
                         </Button>

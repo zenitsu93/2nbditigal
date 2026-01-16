@@ -6,15 +6,19 @@ import { Icon } from '@iconify/react';
 import { projectsApi, Project } from '../../services/api/projects';
 
 const ProjetDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        if (id) {
-          const data = await projectsApi.getById(Number(id));
+        if (slug) {
+          // Essayer d'abord avec le slug, puis avec l'ID si c'est un nombre
+          const isNumeric = /^\d+$/.test(slug);
+          const data = isNumeric 
+            ? await projectsApi.getById(Number(slug))
+            : await projectsApi.getBySlug(slug);
           setProject(data);
         }
       } catch (error) {
@@ -24,7 +28,7 @@ const ProjetDetail = () => {
       }
     };
     fetchProject();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return <div className="container mx-auto px-4 py-12 text-center">Chargement...</div>;

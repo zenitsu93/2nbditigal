@@ -3,6 +3,7 @@ import { apiClient } from './client';
 export interface Article {
   id: number;
   title: string;
+  slug: string;
   excerpt: string;
   content: string;
   image?: string;
@@ -35,19 +36,29 @@ export const articlesApi = {
     if (offset) params.append('offset', offset.toString());
     const query = params.toString() ? `?${params.toString()}` : '';
     
-    const response = await apiClient.get<Article[] | PaginatedResponse<Article>>(`/articles${query}`);
+    const response = await apiClient.get<any>(`/articles${query}`);
     
     // Compatibilité: si la réponse est paginée, extraire les données
-    if (response && typeof response === 'object' && 'data' in response && Array.isArray((response as PaginatedResponse<Article>).data)) {
-      return (response as PaginatedResponse<Article>).data;
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+      return response.data;
     }
     
-    // Sinon, retourner directement (ancien format)
-    return response as Article[];
+    // Si c'est déjà un tableau, le retourner directement
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    // Sinon, retourner un tableau vide en cas d'erreur
+    console.warn('Unexpected response format from articles API:', response);
+    return [];
   },
 
   getById: async (id: number): Promise<Article> => {
     return apiClient.get<Article>(`/articles/${id}`);
+  },
+
+  getBySlug: async (slug: string): Promise<Article> => {
+    return apiClient.get<Article>(`/articles/${slug}`);
   },
 
   create: async (data: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>): Promise<Article> => {

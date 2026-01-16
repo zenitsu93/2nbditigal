@@ -70,7 +70,7 @@ const Actualites = () => {
               <div className="lg:col-span-4 md:col-span-6 col-span-12" key={article.id}>
                 <CardBox className="p-0 overflow-hidden group card-hover h-full flex flex-col">
                   <div className="relative">
-                    <Link to={`/actualites/${article.id}`}>
+                    <Link to={`/actualites/${article.slug || article.id}`}>
                       <div className="overflow-hidden h-[200px] w-full">
                         <img
                           src={article.image || '/images/blog/blog-img1.jpg'}
@@ -89,7 +89,7 @@ const Actualites = () => {
                       <span>•</span>
                       <span>{article.author}</span>
                     </div>
-                    <Link to={`/actualites/${article.id}`}>
+                    <Link to={`/actualites/${article.slug || article.id}`}>
                       <h3 className="text-xl font-semibold text-dark mb-3 group-hover:text-primary transition-colors line-clamp-2 cursor-pointer">
                         {article.title}
                       </h3>
@@ -104,7 +104,7 @@ const Actualites = () => {
                         </Badge>
                       ))}
                     </div>
-                    <Link to={`/actualites/${article.id}`}>
+                    <Link to={`/actualites/${article.slug || article.id}`}>
                       <button className="text-primary hover:underline text-sm font-medium">
                         Lire la suite →
                       </button>

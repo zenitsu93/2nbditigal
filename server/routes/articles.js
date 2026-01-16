@@ -1,6 +1,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import { cacheMiddleware, invalidateCache } from '../middleware/cache.js';
+import { generateSlug, generateUniqueSlug } from '../utils/slug.js';
 import supabase from '../lib/supabase.js';
 
 const router = express.Router();
@@ -16,7 +17,7 @@ router.get('/', cacheMiddleware(5 * 60 * 1000), async (req, res) => {
     
     let query = supabase
       .from('articles')
-      .select('id, title, excerpt, image, video, author, category, tags, published, date, createdAt, updatedAt', { count: 'exact' });
+      .select('id, title, slug, excerpt, image, video, author, category, tags, published, date, createdAt, updatedAt', { count: 'exact' });
 
     if (published !== undefined) {
       query = query.eq('published', published === 'true');
@@ -49,15 +50,23 @@ router.get('/', cacheMiddleware(5 * 60 * 1000), async (req, res) => {
   }
 });
 
-// GET article by ID avec cache
-router.get('/:id', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
+// GET article by ID ou slug avec cache
+router.get('/:identifier', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
-    const { id } = req.params;
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { identifier } = req.params;
+    
+    // Déterminer si c'est un ID numérique ou un slug
+    const isNumeric = /^\d+$/.test(identifier);
+    
+    let query = supabase.from('articles').select('*');
+    
+    if (isNumeric) {
+      query = query.eq('id', parseInt(identifier));
+    } else {
+      query = query.eq('slug', identifier);
+    }
+    
+    const { data, error } = await query.single();
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -76,17 +85,30 @@ router.get('/:id', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
 // CREATE article (admin only)
 router.post('/', authenticateToken, async (req, res) => {
   try {
-    const { title, excerpt, content, image, video, author, category, tags, published, date } = req.body;
+    const { title, excerpt, content, image, video, author, category, tags, published, date, slug } = req.body;
 
     if (!title || !excerpt || !content || !author || !category) {
       return res.status(400).json({ error: 'Title, excerpt, content, author and category are required' });
     }
+
+    // Générer un slug si non fourni
+    let articleSlug = slug || generateSlug(title);
+    
+    // Vérifier l'unicité du slug
+    const checkSlugExists = async (s) => {
+      const { data, error } = await supabase.from('articles').select('id').eq('slug', s).maybeSingle();
+      // Si error existe ou data existe, le slug est pris
+      return !error && data !== null;
+    };
+    
+    articleSlug = await generateUniqueSlug(articleSlug, checkSlugExists);
 
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('articles')
       .insert({
         title,
+        slug: articleSlug,
         excerpt,
         content,
         image: image || null,
@@ -118,7 +140,7 @@ router.post('/', authenticateToken, async (req, res) => {
 router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, excerpt, content, image, video, author, category, tags, published, date } = req.body;
+    const { title, excerpt, content, image, video, author, category, tags, published, date, slug } = req.body;
 
     const updateData = { updatedAt: new Date().toISOString() };
     if (title !== undefined) updateData.title = title;
@@ -131,6 +153,19 @@ router.put('/:id', authenticateToken, async (req, res) => {
     if (tags !== undefined) updateData.tags = tags || [];
     if (published !== undefined) updateData.published = published;
     if (date !== undefined) updateData.date = new Date(date).toISOString();
+    
+    // Générer un nouveau slug si le titre change ou si un slug est fourni
+    if (slug !== undefined) {
+      updateData.slug = slug;
+    } else if (title !== undefined) {
+      // Vérifier l'unicité du slug
+      const checkSlugExists = async (s) => {
+        const { data, error } = await supabase.from('articles').select('id').eq('slug', s).neq('id', parseInt(id)).maybeSingle();
+        // Si error existe ou data existe, le slug est pris
+        return !error && data !== null;
+      };
+      updateData.slug = await generateUniqueSlug(generateSlug(title), checkSlugExists);
+    }
 
     const { data, error } = await supabase
       .from('articles')
@@ -149,6 +184,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
     // Invalider le cache des articles
     invalidateCache('/api/articles');
     invalidateCache(`/api/articles/${id}`);
+    if (data.slug) {
+      invalidateCache(`/api/articles/${data.slug}`);
+    }
 
     res.json(data);
   } catch (error) {
