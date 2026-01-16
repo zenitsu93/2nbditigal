@@ -72,7 +72,7 @@ const Services = () => {
                 displayOverlayContent={true}
                 overlayContent={
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent rounded-xl flex flex-col justify-end p-6">
-                    <h3 className="text-2xl font-bold text-primary drop-shadow-lg mb-3">
+                    <h3 className="text-2xl font-bold text-white drop-shadow-lg mb-3">
                       {service.title}
                     </h3>
                     <div className="mb-4">
