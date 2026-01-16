@@ -71,33 +71,36 @@ const Services = () => {
                 showTooltip={true}
                 displayOverlayContent={true}
                 overlayContent={
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent rounded-xl flex flex-col justify-end p-6">
-                    <h3 className="text-2xl font-bold text-white drop-shadow-lg mb-3">
-                      {service.title}
-                    </h3>
-                    <div className="mb-4">
-                      <p className={`text-sm text-white/90 ${expandedDescriptions.has(service.id) ? '' : 'line-clamp-2'}`}>
-                        {service.description}
-                      </p>
-                      {service.description && service.description.length > 100 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (expandedDescriptions.has(service.id)) {
-                              setExpandedDescriptions(prev => {
-                                const newSet = new Set(prev);
-                                newSet.delete(service.id);
-                                return newSet;
-                              });
-                            } else {
-                              setExpandedDescriptions(prev => new Set(prev).add(service.id));
-                            }
-                          }}
-                          className="text-xs text-white/80 hover:text-white mt-2 font-medium underline transition-colors"
-                        >
-                          {expandedDescriptions.has(service.id) ? 'Voir moins' : 'Voir plus'}
-                        </button>
-                      )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#2a2418]/80 via-[#3d2f1a]/60 to-transparent rounded-xl flex flex-col justify-end p-6">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#cc9445]/20 via-[#cc9445]/10 to-transparent rounded-xl"></div>
+                    <div className="relative z-10">
+                      <h3 className="text-2xl font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] mb-3 leading-tight">
+                        {service.title}
+                      </h3>
+                      <div className="mb-4">
+                        <p className={`text-sm text-white ${expandedDescriptions.has(service.id) ? '' : 'line-clamp-2'} drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]`}>
+                          {service.description}
+                        </p>
+                        {service.description && service.description.length > 100 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (expandedDescriptions.has(service.id)) {
+                                setExpandedDescriptions(prev => {
+                                  const newSet = new Set(prev);
+                                  newSet.delete(service.id);
+                                  return newSet;
+                                });
+                              } else {
+                                setExpandedDescriptions(prev => new Set(prev).add(service.id));
+                              }
+                            }}
+                            className="text-xs text-[#cc9445] hover:text-[#e0a85a] mt-2 font-semibold underline transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                          >
+                            {expandedDescriptions.has(service.id) ? 'Voir moins' : 'Voir plus'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Features */}
@@ -108,13 +111,13 @@ const Services = () => {
                             ? service.features 
                             : service.features.slice(0, 3)
                           ).map((feature, index) => (
-                            <Badge key={index} className="text-xs bg-white/20 text-white border-white/30">
+                            <Badge key={index} className="text-xs bg-[#cc9445]/30 text-white border-[#cc9445]/50 backdrop-blur-sm font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
                               {feature}
                             </Badge>
                           ))}
                           {service.features.length > 3 && !expandedFeatures.has(service.id) && (
                             <Badge 
-                              className="text-xs bg-white/20 text-white border-white/30 cursor-pointer hover:bg-white/30 transition-colors"
+                              className="text-xs bg-[#cc9445]/30 text-white border-[#cc9445]/50 backdrop-blur-sm cursor-pointer hover:bg-[#cc9445]/40 transition-colors font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpandedFeatures(prev => new Set(prev).add(service.id));
