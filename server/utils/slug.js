@@ -1,20 +1,47 @@
 /**
  * Génère un slug à partir d'un titre
  * @param {string} title - Le titre à convertir en slug
+ * @param {number} maxLength - Longueur maximale du slug (défaut: 60)
  * @returns {string} Le slug généré
  */
-export function generateSlug(title) {
+export function generateSlug(title, maxLength = 60) {
   if (!title) return '';
   
-  return title
-    .toLowerCase()
-    .normalize('NFD') // Décompose les caractères accentués
-    .replace(/[\u0300-\u036f]/g, '') // Supprime les diacritiques
+  let slug = title
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '') // Supprime les caractères spéciaux
-    .replace(/\s+/g, '-') // Remplace les espaces par des tirets
-    .replace(/-+/g, '-') // Remplace les tirets multiples par un seul
-    .replace(/^-|-$/g, ''); // Supprime les tirets en début et fin
+    // Remplacer les apostrophes et guillemets par des espaces
+    .replace(/[''""]/g, ' ')
+    // Convertir en minuscules AVANT de normaliser
+    .toLowerCase()
+    // Normaliser les caractères accentués
+    .normalize('NFD')
+    // Supprimer les diacritiques (accents)
+    .replace(/[\u0300-\u036f]/g, '')
+    // Remplacer les caractères spéciaux par des espaces (sauf tirets et underscores)
+    .replace(/[^a-z0-9\s_-]/g, ' ')
+    // Remplacer les espaces multiples par un seul espace
+    .replace(/\s+/g, ' ')
+    .trim()
+    // Remplacer les espaces par des tirets
+    .replace(/\s/g, '-')
+    // Remplacer les tirets multiples par un seul
+    .replace(/-+/g, '-')
+    // Supprimer les tirets en début et fin
+    .replace(/^-+|-+$/g, '');
+  
+  // Limiter la longueur en coupant au dernier tiret avant la limite
+  if (slug.length > maxLength) {
+    slug = slug.substring(0, maxLength);
+    // Couper au dernier tiret pour éviter de couper un mot
+    const lastDash = slug.lastIndexOf('-');
+    if (lastDash > maxLength * 0.7) { // Si le dernier tiret est assez proche de la fin
+      slug = slug.substring(0, lastDash);
+    }
+    // Supprimer le tiret final si présent
+    slug = slug.replace(/-+$/, '');
+  }
+  
+  return slug;
 }
 
 /**
