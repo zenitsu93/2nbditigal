@@ -157,8 +157,16 @@ const AdminArticles = () => {
         showToast('Article modifié avec succès', 'success');
       } else {
         await articlesApi.create({
-          ...formData,
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content,
+          image: formData.image || undefined,
+          video: formData.video || undefined,
+          author: formData.author,
+          category: formData.category,
           tags: tagsArray,
+          published: formData.published,
+          date: formData.date,
         });
         showToast('Article créé avec succès', 'success');
       }

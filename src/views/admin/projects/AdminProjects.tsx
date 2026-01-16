@@ -152,8 +152,13 @@ const AdminProjects = () => {
         showToast('Projet modifié avec succès', 'success');
       } else {
         await projectsApi.create({
-          ...formData,
+          title: formData.title,
+          description: formData.description,
+          image: formData.image || undefined,
+          video: formData.video || undefined,
+          category: formData.category,
           tags: tagsArray,
+          date: formData.date,
         });
         showToast('Projet créé avec succès', 'success');
       }
