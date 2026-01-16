@@ -58,7 +58,7 @@ router.get('/:identifier', cacheMiddleware(10 * 60 * 1000), async (req, res) => 
     // Déterminer si c'est un ID numérique ou un slug
     const isNumeric = /^\d+$/.test(identifier);
     
-    let query = supabase.from('articles').select('*');
+    let query = supabase.from('articles').select('id, title, slug, excerpt, content, image, video, author, category, tags, published, date, createdAt, updatedAt');
     
     if (isNumeric) {
       query = query.eq('id', parseInt(identifier));

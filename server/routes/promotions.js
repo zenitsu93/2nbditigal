@@ -5,14 +5,14 @@ import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET active promotions (public)
+// GET active promotions (public) - Optimisé avec sélection de colonnes spécifiques
 router.get('/active', cacheMiddleware(10 * 60 * 1000), async (req, res) => {
   try {
     const now = new Date().toISOString();
     
     const { data, error } = await supabase
       .from('promotions')
-      .select('*')
+      .select('id, title, description, image, cta_text, start_date, end_date')
       .eq('active', true)
       .or(`start_date.is.null,start_date.lte.${now}`)
       .or(`end_date.is.null,end_date.gte.${now}`)
@@ -33,7 +33,7 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('promotions')
-      .select('*')
+      .select('id, title, description, image, cta_text, active, start_date, end_date, createdAt, updatedAt')
       .order('createdAt', { ascending: false });
 
     if (error) throw error;
@@ -50,7 +50,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { data, error } = await supabase
       .from('promotions')
-      .select('*')
+      .select('id, title, description, image, cta_text, active, start_date, end_date, createdAt, updatedAt')
       .eq('id', id)
       .single();
 

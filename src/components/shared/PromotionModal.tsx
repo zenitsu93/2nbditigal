@@ -40,17 +40,27 @@ const PromotionModal = () => {
   }, [promotion]);
 
   /**
-   * Charge la promotion active depuis l'API
+   * Charge la promotion active depuis l'API de manière non-bloquante
    */
   useEffect(() => {
+    // Vérifier d'abord si une promotion a déjà été fermée pour éviter une requête inutile
+    const dismissedPromotionId = sessionStorage.getItem(STORAGE_KEY);
+    if (dismissedPromotionId) {
+      setLoading(false);
+      return;
+    }
+
+    // Charger la promotion de manière asynchrone sans bloquer le rendu initial
     const fetchPromotion = async () => {
       try {
-        const dismissedPromotionId = sessionStorage.getItem(STORAGE_KEY);
         const data = await promotionsApi.getActive();
         
         if (data && data.id.toString() !== dismissedPromotionId) {
           setPromotion(data);
-          setTimeout(() => setShowModal(true), ANIMATION_DELAY);
+          // Utiliser requestAnimationFrame pour un meilleur timing
+          requestAnimationFrame(() => {
+            setTimeout(() => setShowModal(true), ANIMATION_DELAY);
+          });
         }
       } catch (error) {
         console.error('Error fetching promotion:', error);
@@ -59,7 +69,10 @@ const PromotionModal = () => {
       }
     };
 
-    fetchPromotion();
+    // Délai minimal pour ne pas bloquer le chargement initial de la page
+    const timeoutId = setTimeout(fetchPromotion, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   if (loading || !promotion || !showModal) {

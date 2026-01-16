@@ -28,7 +28,7 @@ router.get('/:id', cacheMiddleware(15 * 60 * 1000), async (req, res) => {
     const id = parseInt(req.params.id);
     const { data, error } = await supabase
       .from('partners')
-      .select('*')
+      .select('id, name, logo, website, createdAt, updatedAt')
       .eq('id', id)
       .single();
 
