@@ -35,7 +35,6 @@ const Login = () => {
           <div className="flex justify-center mb-4">
             <FullLogo />
           </div>
-          <h1 className="text-3xl font-bold text-dark">Connexion Admin</h1>
         </div>
 
         {error && (

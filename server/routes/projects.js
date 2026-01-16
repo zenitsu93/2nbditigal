@@ -6,8 +6,8 @@ import supabase from '../lib/supabase.js';
 
 const router = express.Router();
 
-// GET all projects avec pagination et cache
-router.get('/', cacheMiddleware(5 * 60 * 1000), async (req, res) => {
+// GET all projects avec pagination et cache (TTL réduit pour permettre les mises à jour rapides)
+router.get('/', cacheMiddleware(30 * 1000), async (req, res) => {
   try {
     const { category, limit = '50', offset = '0' } = req.query;
     

@@ -21,13 +21,16 @@ const AdminArticles = () => {
     image: '',
     video: '',
     author: '',
-    category: 'Technologie',
+    category: '',
     tags: '',
     published: false,
     date: new Date().toISOString().split('T')[0],
   });
 
-  const categories = ['Technologie', 'Développement', 'Design', 'Sécurité', 'Mobile', 'Marketing'];
+  // Récupérer les catégories existantes depuis les articles pour suggestions
+  const existingCategories = Array.from(
+    new Set(articles.map(article => article.category).filter(Boolean))
+  ).sort();
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const { toast, showToast, hideToast } = useToast();
@@ -127,7 +130,7 @@ const AdminArticles = () => {
         image: '',
         video: '',
         author: '',
-        category: 'Technologie',
+        category: '',
         tags: '',
         published: false,
         date: new Date().toISOString().split('T')[0],
@@ -433,18 +436,19 @@ const AdminArticles = () => {
                 </div>
                 <div>
                   <Label htmlFor="category">Catégorie *</Label>
-                  <Select
+                  <TextInput
                     id="category"
+                    type="text"
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </Select>
+                    placeholder="Ex: Technologie, Développement, Design..."
+                  />
+                  {existingCategories.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Catégories existantes: {existingCategories.join(', ')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="date">Date *</Label>

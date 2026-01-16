@@ -28,7 +28,6 @@ const Footer = () => {
     legal: [
       { name: 'Mentions légales', href: '/legal' },
       { name: 'Politique de confidentialité', href: '/privacy' },
-      { name: 'CGV', href: '/terms' },
     ],
   };
 

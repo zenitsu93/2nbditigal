@@ -17,11 +17,13 @@ export interface Project {
 export type CreateProjectInput = Omit<Project, 'id' | 'slug' | 'createdAt' | 'updatedAt'> & { slug?: string };
 
 export const projectsApi = {
-  getAll: async (category?: string, limit?: number, offset?: number): Promise<Project[]> => {
+  getAll: async (category?: string, limit?: number, offset?: number, noCache?: boolean): Promise<Project[]> => {
     const params = new URLSearchParams();
     if (category && category !== 'Tous') params.append('category', category);
     if (limit) params.append('limit', limit.toString());
     if (offset) params.append('offset', offset.toString());
+    // Ajouter un paramètre pour éviter le cache si nécessaire
+    if (noCache) params.append('_t', Date.now().toString());
     const query = params.toString() ? `?${params.toString()}` : '';
     
     const response = await apiClient.get<any>(`/projects${query}`);

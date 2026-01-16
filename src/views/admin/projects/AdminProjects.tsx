@@ -19,12 +19,15 @@ const AdminProjects = () => {
     description: '',
     image: '',
     video: '',
-    category: 'Web',
+    category: '',
     tags: '',
     date: new Date().toISOString().split('T')[0],
   });
 
-  const categories = ['Web', 'Mobile', 'Design'];
+  // Récupérer les catégories existantes depuis les projets pour suggestions
+  const existingCategories = Array.from(
+    new Set(projects.map(project => project.category).filter(Boolean))
+  ).sort();
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const { toast, showToast, hideToast } = useToast();
@@ -123,7 +126,7 @@ const AdminProjects = () => {
         description: '',
         image: '',
         video: '',
-        category: 'Web',
+        category: '',
         tags: '',
         date: new Date().toISOString().split('T')[0],
       });
@@ -163,7 +166,10 @@ const AdminProjects = () => {
         showToast('Projet créé avec succès', 'success');
       }
       handleCloseModal();
-      fetchProjects();
+      // Attendre un peu pour que le cache soit invalidé
+      setTimeout(() => {
+        fetchProjects();
+      }, 500);
     } catch (error) {
       console.error('Error saving project:', error);
       showToast('Erreur lors de la sauvegarde', 'error');
@@ -414,18 +420,19 @@ const AdminProjects = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="category">Catégorie *</Label>
-                  <Select
+                  <TextInput
                     id="category"
+                    type="text"
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </Select>
+                    placeholder="Ex: E-commerce, Application Mobile..."
+                  />
+                  {existingCategories.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Catégories existantes: {existingCategories.join(', ')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="date">Date *</Label>

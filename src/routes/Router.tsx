@@ -21,7 +21,6 @@ const Contact = Loadable(lazy(() => import('../views/contact/Contact')));
 // Pages légales
 const MentionsLegales = Loadable(lazy(() => import('../views/legal/MentionsLegales')));
 const PolitiqueConfidentialite = Loadable(lazy(() => import('../views/legal/PolitiqueConfidentialite')));
-const CGV = Loadable(lazy(() => import('../views/legal/CGV')));
 
 // Pages admin
 const Login = Loadable(lazy(() => import('../views/admin/Login')));
@@ -47,7 +46,6 @@ const Router = [
       { path: '/contact', exact: true, element: <Contact /> },
       { path: '/legal', exact: true, element: <MentionsLegales /> },
       { path: '/privacy', exact: true, element: <PolitiqueConfidentialite /> },
-      { path: '/terms', exact: true, element: <CGV /> },
       { path: '*', element: <Navigate to="/" /> },
     ],
   },

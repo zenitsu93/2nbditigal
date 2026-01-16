@@ -12,6 +12,11 @@ export const cacheMiddleware = (ttl = 5 * 60 * 1000, skipCache = false) => {
       return next();
     }
 
+    // Ignorer le cache si le paramètre _t (timestamp) est présent
+    if (req.query._t) {
+      return next();
+    }
+
     // Générer la clé de cache
     const cacheKey = cache.generateKey(req.originalUrl, req.query);
 

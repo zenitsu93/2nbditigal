@@ -55,6 +55,8 @@ class ApiClient {
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
     };
 
     // Ajouter les headers personnalisés

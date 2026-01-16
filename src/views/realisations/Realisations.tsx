@@ -1,11 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import CardBox from '../../components/shared/CardBox';
 import { Button, Badge, Pagination } from 'flowbite-react';
 import { Link } from 'react-router';
 import { projectsApi, Project } from '../../services/api/projects';
-
-// Catégories disponibles
-const categories = ['Tous', 'Web', 'Mobile', 'Design'];
 
 const Realisations = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -18,7 +15,8 @@ const Realisations = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const data = await projectsApi.getAll();
+        // Forcer le rechargement sans cache
+        const data = await projectsApi.getAll(undefined, undefined, undefined, true);
         setProjects(data);
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -28,6 +26,17 @@ const Realisations = () => {
     };
     fetchProjects();
   }, []);
+
+  // Récupérer les catégories uniques depuis les projets
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(projects.map(project => project.category).filter(Boolean))
+    ).sort();
+    const result = ['Tous', ...uniqueCategories];
+    console.log('Categories calculées:', result);
+    console.log('Projets:', projects.map(p => ({ id: p.id, title: p.title, category: p.category })));
+    return result;
+  }, [projects]);
 
   // Filtrer les projets selon la catégorie sélectionnée
   const filteredProjects = selectedCategory === 'Tous' 
