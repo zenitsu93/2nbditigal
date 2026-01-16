@@ -17,6 +17,8 @@ export interface Article {
   updatedAt: string;
 }
 
+export type CreateArticleInput = Omit<Article, 'id' | 'slug' | 'createdAt' | 'updatedAt'> & { slug?: string };
+
 export const articlesApi = {
   getAll: async (published?: boolean, category?: string, limit?: number, offset?: number): Promise<Article[]> => {
     const params = new URLSearchParams();
@@ -51,7 +53,7 @@ export const articlesApi = {
     return apiClient.get<Article>(`/articles/${slug}`);
   },
 
-  create: async (data: Omit<Article, 'id' | 'slug' | 'createdAt' | 'updatedAt'> & { slug?: string }): Promise<Article> => {
+  create: async (data: CreateArticleInput): Promise<Article> => {
     return apiClient.post<Article>('/articles', data);
   },
 
