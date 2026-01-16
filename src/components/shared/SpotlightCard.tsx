@@ -7,11 +7,7 @@ interface SpotlightCardProps {
   spotlightColor?: string;
 }
 
-const SpotlightCard = ({ 
-  children, 
-  className = '', 
-  spotlightColor = 'rgba(212, 175, 55, 0.15)' 
-}: SpotlightCardProps) => {
+const SpotlightCard = ({ children, className = '', spotlightColor = 'rgba(255, 255, 255, 0.25)' }: SpotlightCardProps) => {
   const divRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -27,11 +23,7 @@ const SpotlightCard = ({
   };
 
   return (
-    <div 
-      ref={divRef} 
-      onMouseMove={handleMouseMove} 
-      className={`card-spotlight ${className}`}
-    >
+    <div ref={divRef} onMouseMove={handleMouseMove} className={`card-spotlight ${className}`}>
       {children}
     </div>
   );

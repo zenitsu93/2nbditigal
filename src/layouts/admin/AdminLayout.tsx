@@ -20,6 +20,7 @@ const AdminLayout: FC = () => {
     { path: '/admin/services', label: 'Services', icon: 'solar:widget-5-line-duotone' },
     { path: '/admin/projects', label: 'Projets', icon: 'solar:folder-with-files-linear' },
     { path: '/admin/articles', label: 'Articles', icon: 'solar:document-text-line-duotone' },
+    { path: '/admin/promotions', label: 'Promotions', icon: 'solar:gift-line-duotone' },
     { path: '/admin/partners', label: 'Partenaires', icon: 'solar:users-group-two-rounded-line-duotone' },
     { path: '/admin/testimonials', label: 'Témoignages', icon: 'solar:chat-round-line-duotone' },
     { path: '/admin/config', label: 'Configuration', icon: 'solar:settings-line-duotone' },

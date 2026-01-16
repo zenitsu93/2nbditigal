@@ -9,6 +9,7 @@ import testimonialRoutes from './routes/testimonials.js';
 import uploadRoutes from './routes/upload.js';
 import authRoutes from './routes/auth.js';
 import configRoutes from './routes/config.js';
+import promotionRoutes from './routes/promotions.js';
 import { authenticateToken } from './middleware/auth.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -67,6 +68,7 @@ app.use('/api/articles', articleRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/promotions', promotionRoutes);
 app.use('/api/upload', authenticateToken, uploadRoutes);
 
 // Health check

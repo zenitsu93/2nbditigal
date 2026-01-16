@@ -9,6 +9,7 @@ import AnimatedButton from '../../components/shared/AnimatedButton';
 import TextType from '../../components/shared/TextType';
 import TiltedCard from '../../components/shared/TiltedCard';
 import LogoLoop from '../../components/shared/LogoLoop';
+import PromotionModal from '../../components/shared/PromotionModal';
 import { partnersApi, Partner } from '../../services/api/partners';
 import { servicesApi, Service } from '../../services/api/services';
 import { configApi } from '../../services/api/config';
@@ -345,6 +346,9 @@ const Accueil = () => {
 
   return (
     <>
+      {/* Popup promotionnelle */}
+      <PromotionModal />
+      
       {/* Hero Section */}
       <section className="bg-white py-12">
         <div className="container mx-auto px-4">
