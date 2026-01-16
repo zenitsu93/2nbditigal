@@ -142,10 +142,10 @@ const AdminPromotions = () => {
   };
 
   const handleDelete = async (id: number) => {
-    showConfirm({
-      title: 'Supprimer la promotion',
-      message: 'Êtes-vous sûr de vouloir supprimer cette promotion ?',
-      onConfirm: async () => {
+    showConfirm(
+      'Supprimer la promotion',
+      'Êtes-vous sûr de vouloir supprimer cette promotion ?',
+      async () => {
         try {
           await promotionsApi.delete(id);
           showToast('Promotion supprimée avec succès', 'success');
@@ -154,8 +154,8 @@ const AdminPromotions = () => {
           console.error('Error deleting promotion:', error);
           showToast('Erreur lors de la suppression', 'error');
         }
-      },
-    });
+      }
+    );
   };
 
   const handleToggleActive = async (promotion: Promotion) => {
@@ -369,7 +369,7 @@ const AdminPromotions = () => {
       </Modal>
 
       <Toast {...toast} onClose={hideToast} />
-      <ConfirmDialog {...dialog} onClose={hideConfirm} onConfirm={handleConfirm} />
+      <ConfirmDialog {...dialog} onCancel={hideConfirm} onConfirm={handleConfirm} />
     </div>
   );
 };

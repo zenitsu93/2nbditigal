@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router';
 import { Button } from 'flowbite-react';
 import { Icon } from '@iconify/react';
 import { promotionsApi, Promotion } from '../../services/api/promotions';
