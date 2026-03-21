@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CardBox from '../../components/shared/CardBox';
 import { Card } from 'flowbite-react';
 import { Icon } from '@iconify/react';
@@ -15,239 +15,67 @@ import { partnersApi, Partner } from '../../services/api/partners';
 import { servicesApi, Service } from '../../services/api/services';
 import { configApi } from '../../services/api/config';
 
-// Variable globale pour partager l'état du son entre les composants
-let globalVideoRef: HTMLVideoElement | null = null;
-let globalIsMuted = true;
-let globalShowSoundHint = true;
+const extractYoutubeVideoId = (url: string): string | null => {
+  if (!url) return null;
 
-// Composant VideoPlayer avec lecture automatique après délai
-const VideoPlayer = ({ videoUrl }: { videoUrl: string }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showSoundHint, setShowSoundHint] = useState(true);
+  const trimmed = url.trim();
+  if (!trimmed) return null;
 
-  // Synchroniser l'état local avec les variables globales
-  useEffect(() => {
-    if (videoRef.current) {
-      globalVideoRef = videoRef.current;
-      globalIsMuted = isMuted;
-      globalShowSoundHint = showSoundHint;
+  const simpleIdRegex = /^[a-zA-Z0-9_-]{11}$/;
+  if (simpleIdRegex.test(trimmed)) return trimmed;
+
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.replace(/^www\./, '');
+
+    if (host === 'youtu.be') {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      return id && simpleIdRegex.test(id) ? id : null;
     }
-  }, [isMuted, showSoundHint]);
 
-  // Écouter les changements des variables globales (quand le son est activé depuis l'extérieur)
-  useEffect(() => {
-    const checkGlobalState = () => {
-      if (globalVideoRef === videoRef.current) {
-        if (!globalIsMuted && isMuted) {
-          setIsMuted(false);
-        }
-        if (!globalShowSoundHint && showSoundHint) {
-          setShowSoundHint(false);
-        }
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+      if (parsed.pathname === '/watch') {
+        const id = parsed.searchParams.get('v');
+        return id && simpleIdRegex.test(id) ? id : null;
       }
-    };
 
-    const interval = setInterval(checkGlobalState, 100);
-    return () => clearInterval(interval);
-  }, [isMuted, showSoundHint]);
-
-  // Réinitialiser hasStarted quand la vidéo change
-  useEffect(() => {
-    setHasStarted(false);
-  }, [videoUrl]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || hasStarted || !videoUrl) return;
-
-    let timer: ReturnType<typeof setTimeout>;
-    let fallbackTimer: ReturnType<typeof setTimeout>;
-
-    // Attendre que la vidéo soit prête
-    const handleCanPlay = () => {
-      // Démarrer la vidéo après 2 secondes
-      timer = setTimeout(() => {
-        if (video && !hasStarted) {
-          video.muted = true; // S'assurer qu'elle est en sourdine
-          video.play().then(() => {
-            console.log('Vidéo démarrée avec succès');
-            setHasStarted(true);
-          }).catch((error) => {
-            console.error('Erreur lors de la lecture automatique:', error);
-          });
-        }
-      }, 2000);
-    };
-
-    video.addEventListener('canplay', handleCanPlay);
-    
-    // Fallback : démarrer après 3 secondes même si canplay ne se déclenche pas
-    fallbackTimer = setTimeout(() => {
-      if (video && !hasStarted) {
-        video.muted = true;
-        video.play().then(() => {
-          console.log('Vidéo démarrée avec succès (fallback)');
-          setHasStarted(true);
-        }).catch((error) => {
-          console.error('Erreur lors de la lecture automatique:', error);
-        });
+      if (parsed.pathname.startsWith('/embed/')) {
+        const id = parsed.pathname.split('/')[2];
+        return id && simpleIdRegex.test(id) ? id : null;
       }
-    }, 3000);
 
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      if (timer) clearTimeout(timer);
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-    };
-  }, [hasStarted, videoUrl]);
-
-  const handleToggleMute = () => {
-    if (videoRef.current) {
-      const newMutedState = !videoRef.current.muted;
-      videoRef.current.muted = newMutedState;
-      setIsMuted(newMutedState);
-      globalIsMuted = newMutedState;
-      if (newMutedState === false) {
-        setShowSoundHint(false);
-        globalShowSoundHint = false;
+      if (parsed.pathname.startsWith('/shorts/')) {
+        const id = parsed.pathname.split('/')[2];
+        return id && simpleIdRegex.test(id) ? id : null;
       }
     }
-  };
+  } catch {
+    return null;
+  }
 
-  // Synchroniser l'état local avec les variables globales
-  useEffect(() => {
-    if (videoRef.current) {
-      globalVideoRef = videoRef.current;
-    }
-  }, []);
-
-  return (
-    <div 
-      className="absolute inset-0 w-full h-full cursor-pointer"
-      onClick={(e) => {
-        // Si c'est le premier clic et que le son est en sourdine, activer le son
-        // Ignorer les clics sur le bouton volume
-        if (isMuted && showSoundHint && (e.target as HTMLElement).tagName !== 'BUTTON') {
-          handleToggleMute();
-        }
-      }}
-    >
-      {videoUrl && videoUrl.trim() ? (
-        <video
-          key={videoUrl}
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          controls
-          muted={isMuted}
-          playsInline
-          preload="metadata"
-          onClick={(e) => {
-            // Si c'est le premier clic et que le son est en sourdine, activer le son
-            if (isMuted && showSoundHint) {
-              e.stopPropagation();
-              handleToggleMute();
-            }
-          }}
-          onError={(e) => {
-            const video = e.currentTarget;
-            const error = video.error;
-            if (error) {
-              console.error('Erreur vidéo:', {
-                code: error.code,
-                message: error.message,
-                url: videoUrl
-              });
-            } else {
-              console.warn('Erreur de chargement vidéo (URL:', videoUrl, ')');
-            }
-          }}
-          onLoadedMetadata={() => {
-            console.log('Métadonnées vidéo chargées pour:', videoUrl);
-          }}
-        >
-          <source src={videoUrl} type="video/mp4" />
-          Votre navigateur ne supporte pas la lecture de vidéos.
-        </video>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
-          <p>Chargement de la vidéo...</p>
-          {!videoUrl && <p className="text-xs mt-2">URL vidéo non définie</p>}
-        </div>
-      )}
-
-      {/* Bouton mute/unmute et message */}
-      <div 
-        className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleToggleMute();
-          }}
-          className="w-12 h-12 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-opacity-70 transition-all duration-300"
-          aria-label={isMuted ? 'Activer le son' : 'Désactiver le son'}
-        >
-          {isMuted ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path>
-              <line x1="22" x2="16" y1="9" y2="15"></line>
-              <line x1="16" x2="22" y1="9" y2="15"></line>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path>
-              <path d="M19 10a7 7 0 0 1 0 4"></path>
-              <path d="M15 8a3 3 0 0 1 0 8"></path>
-            </svg>
-          )}
-        </button>
-
-        {/* Message "Son activé au premier clic" */}
-        {showSoundHint && (
-          <div className="bg-amber-500 text-white text-xs px-3 py-1 rounded-full shadow-lg animate-pulse whitespace-nowrap">
-            Son activé au premier clic
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return null;
 };
 
-// Composant wrapper pour gérer le clic sur toute la page
+const buildYoutubeEmbedUrl = (url: string): string | null => {
+  const videoId = extractYoutubeVideoId(url);
+  if (!videoId) return null;
+
+  const params = new URLSearchParams({
+    autoplay: '1',
+    mute: '1',
+    rel: '0',
+    modestbranding: '1',
+    playsinline: '1',
+    loop: '1',
+    playlist: videoId,
+  });
+
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+};
+
 const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
-  useEffect(() => {
-    // Gérer le clic sur toute la page pour activer le son
-    const handlePageClick = (e: MouseEvent) => {
-      if (!globalVideoRef || !globalIsMuted || !globalShowSoundHint) return;
-      
-      const target = e.target as HTMLElement;
-      // Ignorer les clics sur les éléments interactifs
-      if (target.tagName === 'BUTTON' || 
-          target.closest('button') ||
-          target.closest('a') ||
-          target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.tagName === 'SELECT') {
-        return;
-      }
-
-      // Activer le son
-      if (globalVideoRef) {
-        globalVideoRef.muted = false;
-        globalIsMuted = false;
-        globalShowSoundHint = false;
-      }
-    };
-
-    window.addEventListener('click', handlePageClick, true);
-
-    return () => {
-      window.removeEventListener('click', handlePageClick, true);
-    };
-  }, []);
+  const youtubeEmbedUrl = useMemo(() => buildYoutubeEmbedUrl(videoUrl), [videoUrl]);
+  const hasVideo = Boolean(videoUrl?.trim());
 
   return (
     <section className="py-16 bg-gray-50">
@@ -255,7 +83,33 @@ const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
         <div className="max-w-5xl mx-auto">
           <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200">
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <VideoPlayer videoUrl={videoUrl} />
+              {youtubeEmbedUrl ? (
+                <iframe
+                  key={youtubeEmbedUrl}
+                  src={youtubeEmbedUrl}
+                  title="Video de presentation"
+                  className="absolute inset-0 h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              ) : hasVideo ? (
+                <video
+                  key={videoUrl}
+                  src={videoUrl}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500">
+                  Lien video YouTube non defini.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -266,7 +120,7 @@ const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
 
 const Accueil = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [presentationVideo, setPresentationVideo] = useState('/videos/presentation.mp4');
+  const [presentationVideo, setPresentationVideo] = useState('');
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
 

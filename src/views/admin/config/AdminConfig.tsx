@@ -3,14 +3,69 @@ import { Button, Label, TextInput } from 'flowbite-react';
 import { Icon } from '@iconify/react';
 import CardBox from '../../../components/shared/CardBox';
 import { configApi } from '../../../services/api/config';
-import { uploadApi } from '../../../services/api/upload';
-import { getApiBaseUrl } from '../../../services/api/client';
 import Toast from '../../../components/shared/Toast';
 import { useToast } from '../../../hooks/useToast';
 
+const extractYoutubeVideoId = (url: string): string | null => {
+  if (!url) return null;
+
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  const simpleIdRegex = /^[a-zA-Z0-9_-]{11}$/;
+  if (simpleIdRegex.test(trimmed)) return trimmed;
+
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.replace(/^www\./, '');
+
+    if (host === 'youtu.be') {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      return id && simpleIdRegex.test(id) ? id : null;
+    }
+
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+      if (parsed.pathname === '/watch') {
+        const id = parsed.searchParams.get('v');
+        return id && simpleIdRegex.test(id) ? id : null;
+      }
+
+      if (parsed.pathname.startsWith('/embed/')) {
+        const id = parsed.pathname.split('/')[2];
+        return id && simpleIdRegex.test(id) ? id : null;
+      }
+
+      if (parsed.pathname.startsWith('/shorts/')) {
+        const id = parsed.pathname.split('/')[2];
+        return id && simpleIdRegex.test(id) ? id : null;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
+const buildYoutubeEmbedUrl = (url: string): string | null => {
+  const videoId = extractYoutubeVideoId(url);
+  if (!videoId) return null;
+
+  const params = new URLSearchParams({
+    autoplay: '1',
+    mute: '1',
+    rel: '0',
+    modestbranding: '1',
+    playsinline: '1',
+    loop: '1',
+    playlist: videoId,
+  });
+
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+};
+
 const AdminConfig = () => {
   const [loading, setLoading] = useState(true);
-  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [presentationVideo, setPresentationVideo] = useState('');
   const { toast, showToast, hideToast } = useToast();
 
@@ -22,7 +77,7 @@ const AdminConfig = () => {
     try {
       setLoading(true);
       const config = await configApi.getAll();
-      setPresentationVideo(config.presentation_video || '/videos/presentation.mp4');
+      setPresentationVideo(config.presentation_video || '');
     } catch (error: any) {
       console.error('Error fetching config:', error);
       showToast('Erreur lors du chargement de la configuration', 'error');
@@ -31,41 +86,16 @@ const AdminConfig = () => {
     }
   };
 
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('video/')) {
-      showToast('Veuillez sélectionner un fichier vidéo', 'error');
+  const handleVideoUrlChange = async (url: string) => {
+    const trimmedUrl = url.trim();
+    if (trimmedUrl && !extractYoutubeVideoId(trimmedUrl)) {
+      showToast('Veuillez entrer un lien YouTube valide', 'error');
       return;
     }
 
     try {
-      setUploadingVideo(true);
-      const result = await uploadApi.uploadFile(file);
-      // L'URL de Supabase Storage est déjà complète, pas besoin d'ajouter apiBaseUrl
-      const fullUrl = result.url.startsWith('http://') || result.url.startsWith('https://') 
-        ? result.url 
-        : (getApiBaseUrl() ? `${getApiBaseUrl()}${result.url}` : result.url);
-      
-      // Mettre à jour la configuration
-      await configApi.update('presentation_video', fullUrl);
-      setPresentationVideo(fullUrl);
-      showToast('Vidéo uploadée et configurée avec succès', 'success');
-    } catch (error: any) {
-      console.error('Error uploading video:', error);
-      const errorMessage = error?.message || 'Erreur lors de l\'upload de la vidéo';
-      showToast(errorMessage, 'error');
-    } finally {
-      setUploadingVideo(false);
-      e.target.value = '';
-    }
-  };
-
-  const handleVideoUrlChange = async (url: string) => {
-    try {
-      await configApi.update('presentation_video', url);
-      setPresentationVideo(url);
+      await configApi.update('presentation_video', trimmedUrl);
+      setPresentationVideo(trimmedUrl);
       showToast('Configuration mise à jour avec succès', 'success');
     } catch (error: any) {
       console.error('Error updating config:', error);
@@ -92,14 +122,14 @@ const AdminConfig = () => {
             Vidéo de présentation
           </h2>
           <p className="text-gray-600 text-sm mb-4">
-            Cette vidéo sera affichée sur la page d'accueil du site.
+            Collez un lien YouTube. La video sera embarquee et lancee automatiquement sur la page d'accueil.
           </p>
         </div>
 
         <div className="space-y-4">
           <div>
             <Label htmlFor="video-url" className="mb-2 block">
-              URL de la vidéo
+              Lien YouTube
             </Label>
             <div className="flex gap-2">
               <TextInput
@@ -108,7 +138,7 @@ const AdminConfig = () => {
                 value={presentationVideo}
                 onChange={(e) => setPresentationVideo(e.target.value)}
                 onBlur={(e) => handleVideoUrlChange(e.target.value)}
-                placeholder="/videos/presentation.mp4"
+                placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
                 className="flex-1"
               />
               <Button
@@ -121,68 +151,34 @@ const AdminConfig = () => {
             </div>
           </div>
 
-          <div className="border-t pt-4">
-            <Label htmlFor="video-upload" className="mb-2 block">
-              Ou uploader une nouvelle vidéo
-            </Label>
-            <input
-              type="file"
-              id="video-upload"
-              accept="video/*"
-              onChange={handleVideoUpload}
-              className="hidden"
-            />
-            <div className="flex gap-2">
-              <Button
-                color="light"
-                onClick={() => document.getElementById('video-upload')?.click()}
-                disabled={uploadingVideo}
-              >
-                <Icon icon="solar:upload-line-duotone" className="mr-2" />
-                {uploadingVideo ? 'Upload en cours...' : 'Choisir une vidéo'}
-              </Button>
-              <span className="text-sm text-gray-500 self-center">
-                Formats acceptés: MP4, WebM, OGG, MOV (max 50MB)
-              </span>
-            </div>
-          </div>
-
           {presentationVideo && (
             <div className="mt-4 border-t pt-4">
               <Label className="mb-2 block">Aperçu</Label>
               <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
-                <video
-                  key={presentationVideo}
-                  src={presentationVideo}
-                  controls
-                  className="w-full max-h-96"
-                  preload="metadata"
-                  crossOrigin="anonymous"
-                  onError={(e) => {
-                    const video = e.currentTarget;
-                    const error = video.error;
-                    console.error('Erreur de chargement vidéo:', {
-                      code: error?.code,
-                      message: error?.message,
-                      url: presentationVideo
-                    });
-                    // Ne pas afficher de toast pour éviter le spam, juste logger
-                  }}
-                  onLoadedMetadata={() => {
-                    console.log('Vidéo chargée avec succès:', presentationVideo);
-                  }}
-                >
-                  <source src={presentationVideo} type="video/mp4" />
-                  <source src={presentationVideo} type="video/webm" />
-                  Votre navigateur ne supporte pas la lecture de vidéos.
-                </video>
+                {buildYoutubeEmbedUrl(presentationVideo) ? (
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <iframe
+                      key={presentationVideo}
+                      src={buildYoutubeEmbedUrl(presentationVideo) || undefined}
+                      title="Apercu video YouTube"
+                      className="absolute inset-0 h-full w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <div className="p-4 text-sm text-yellow-200 bg-yellow-900/40">
+                    Lien YouTube invalide. Exemple attendu: https://www.youtube.com/watch?v=XXXXXXXXXXX
+                  </div>
+                )}
                 <div className="p-2 bg-gray-100 text-xs text-gray-600 break-all">
                   <div className="mb-1"><strong>URL:</strong> {presentationVideo}</div>
-                  {presentationVideo.startsWith('http') && (
-                    <div className="text-green-600">✓ URL complète détectée</div>
+                  {extractYoutubeVideoId(presentationVideo) && (
+                    <div className="text-green-600">Lien YouTube valide</div>
                   )}
-                  {!presentationVideo.startsWith('http') && (
-                    <div className="text-yellow-600">⚠ URL relative - peut nécessiter un serveur pour servir les fichiers</div>
+                  {!extractYoutubeVideoId(presentationVideo) && (
+                    <div className="text-yellow-600">Lien YouTube invalide</div>
                   )}
                 </div>
               </div>
