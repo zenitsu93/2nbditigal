@@ -289,8 +289,7 @@ const Accueil = () => {
                       showTooltip={true}
                       displayOverlayContent={true}
                       overlayContent={
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#2a2418]/80 via-[#3d2f1a]/60 to-transparent rounded-xl flex flex-col justify-end p-6">
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#cc9445]/20 via-[#cc9445]/10 to-transparent rounded-xl"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-black/60 to-transparent rounded-xl flex flex-col justify-end p-6">
                           <div className="relative z-10">
                             <h5 className="text-xl font-bold text-white mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] leading-tight">
                               {service.title}
