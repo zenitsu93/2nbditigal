@@ -1,0 +1,10 @@
+/* Cartes témoignages dans LogoLoop : annule font-size basée sur logoHeight */
+.testimonials-logoloop.logoloop .logoloop__item {
+  font-size: 1rem;
+  line-height: normal;
+}
+
+.testimonials-logoloop.logoloop .logoloop__node {
+  display: block;
+  width: 100%;
+}
