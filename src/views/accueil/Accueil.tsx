@@ -14,103 +14,42 @@ const PromotionModal = lazy(() => import('../../components/shared/PromotionModal
 import { partnersApi, Partner } from '../../services/api/partners';
 import { servicesApi, Service } from '../../services/api/services';
 import { configApi } from '../../services/api/config';
-
-const extractYoutubeVideoId = (url: string): string | null => {
-  if (!url) return null;
-
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-
-  const simpleIdRegex = /^[a-zA-Z0-9_-]{11}$/;
-  if (simpleIdRegex.test(trimmed)) return trimmed;
-
-  try {
-    const parsed = new URL(trimmed);
-    const host = parsed.hostname.replace(/^www\./, '');
-
-    if (host === 'youtu.be') {
-      const id = parsed.pathname.split('/').filter(Boolean)[0];
-      return id && simpleIdRegex.test(id) ? id : null;
-    }
-
-    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
-      if (parsed.pathname === '/watch') {
-        const id = parsed.searchParams.get('v');
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-
-      if (parsed.pathname.startsWith('/embed/')) {
-        const id = parsed.pathname.split('/')[2];
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-
-      if (parsed.pathname.startsWith('/shorts/')) {
-        const id = parsed.pathname.split('/')[2];
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-};
-
-const buildYoutubeEmbedUrl = (url: string): string | null => {
-  const videoId = extractYoutubeVideoId(url);
-  if (!videoId) return null;
-
-  const params = new URLSearchParams({
-    autoplay: '1',
-    mute: '1',
-    rel: '0',
-    modestbranding: '1',
-    playsinline: '1',
-    loop: '1',
-    playlist: videoId,
-  });
-
-  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
-};
+import YoutubeLazyEmbed from '../../components/shared/YoutubeLazyEmbed';
+import { extractYoutubeVideoId } from '../../utils/youtubeUrl';
 
 const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
-  const youtubeEmbedUrl = useMemo(() => buildYoutubeEmbedUrl(videoUrl), [videoUrl]);
   const hasVideo = Boolean(videoUrl?.trim());
+  const youtubeId = useMemo(() => (videoUrl ? extractYoutubeVideoId(videoUrl) : null), [videoUrl]);
 
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200">
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              {youtubeEmbedUrl ? (
-                <iframe
-                  key={youtubeEmbedUrl}
-                  src={youtubeEmbedUrl}
-                  title="Video de presentation"
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              ) : hasVideo ? (
-                <video
-                  key={videoUrl}
-                  src={videoUrl}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500">
-                  Lien video YouTube non defini.
-                </div>
-              )}
-            </div>
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-black">
+            {youtubeId ? (
+              <YoutubeLazyEmbed
+                videoUrl={videoUrl}
+                title="Vidéo de présentation"
+                className="!rounded-none shadow-none"
+              />
+            ) : (
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                {hasVideo ? (
+                  <video
+                    key={videoUrl}
+                    src={videoUrl}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    controls
+                    playsInline
+                    preload="metadata"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500">
+                    Lien video YouTube non defini.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -289,7 +228,7 @@ const Accueil = () => {
                       showTooltip={true}
                       displayOverlayContent={true}
                       overlayContent={
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-black/60 to-transparent rounded-xl flex flex-col justify-end p-6">
+                        <div className="absolute inset-0 rounded-xl flex flex-col justify-end p-6 [background:linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.2)_32%,transparent_55%)]">
                           <div className="relative z-10">
                             <h5 className="text-xl font-bold text-white mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] leading-tight">
                               {service.title}

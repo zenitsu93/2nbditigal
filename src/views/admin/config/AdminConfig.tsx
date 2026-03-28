@@ -5,64 +5,8 @@ import CardBox from '../../../components/shared/CardBox';
 import { configApi } from '../../../services/api/config';
 import Toast from '../../../components/shared/Toast';
 import { useToast } from '../../../hooks/useToast';
-
-const extractYoutubeVideoId = (url: string): string | null => {
-  if (!url) return null;
-
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-
-  const simpleIdRegex = /^[a-zA-Z0-9_-]{11}$/;
-  if (simpleIdRegex.test(trimmed)) return trimmed;
-
-  try {
-    const parsed = new URL(trimmed);
-    const host = parsed.hostname.replace(/^www\./, '');
-
-    if (host === 'youtu.be') {
-      const id = parsed.pathname.split('/').filter(Boolean)[0];
-      return id && simpleIdRegex.test(id) ? id : null;
-    }
-
-    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
-      if (parsed.pathname === '/watch') {
-        const id = parsed.searchParams.get('v');
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-
-      if (parsed.pathname.startsWith('/embed/')) {
-        const id = parsed.pathname.split('/')[2];
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-
-      if (parsed.pathname.startsWith('/shorts/')) {
-        const id = parsed.pathname.split('/')[2];
-        return id && simpleIdRegex.test(id) ? id : null;
-      }
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-};
-
-const buildYoutubeEmbedUrl = (url: string): string | null => {
-  const videoId = extractYoutubeVideoId(url);
-  if (!videoId) return null;
-
-  const params = new URLSearchParams({
-    autoplay: '1',
-    mute: '1',
-    rel: '0',
-    modestbranding: '1',
-    playsinline: '1',
-    loop: '1',
-    playlist: videoId,
-  });
-
-  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
-};
+import YoutubeLazyEmbed from '../../../components/shared/YoutubeLazyEmbed';
+import { extractYoutubeVideoId } from '../../../utils/youtubeUrl';
 
 const AdminConfig = () => {
   const [loading, setLoading] = useState(true);
@@ -122,7 +66,7 @@ const AdminConfig = () => {
             Vidéo de présentation
           </h2>
           <p className="text-gray-600 text-sm mb-4">
-            Collez un lien YouTube. La video sera embarquee et lancee automatiquement sur la page d'accueil.
+            Collez un lien YouTube. Sur l’accueil, la miniature s’affiche d’abord ; la lecture démarre lorsque le visiteur clique sur lecture.
           </p>
         </div>
 
@@ -155,18 +99,13 @@ const AdminConfig = () => {
             <div className="mt-4 border-t pt-4">
               <Label className="mb-2 block">Aperçu</Label>
               <div className="rounded-lg overflow-hidden border border-gray-200 bg-black">
-                {buildYoutubeEmbedUrl(presentationVideo) ? (
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                    <iframe
-                      key={presentationVideo}
-                      src={buildYoutubeEmbedUrl(presentationVideo) || undefined}
-                      title="Apercu video YouTube"
-                      className="absolute inset-0 h-full w-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      allowFullScreen
-                    />
-                  </div>
+                {extractYoutubeVideoId(presentationVideo) ? (
+                  <YoutubeLazyEmbed
+                    key={presentationVideo}
+                    videoUrl={presentationVideo}
+                    title="Aperçu vidéo YouTube"
+                    className="!rounded-none shadow-none"
+                  />
                 ) : (
                   <div className="p-4 text-sm text-yellow-200 bg-yellow-900/40">
                     Lien YouTube invalide. Exemple attendu: https://www.youtube.com/watch?v=XXXXXXXXXXX

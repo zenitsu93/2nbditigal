@@ -71,7 +71,7 @@ const Services = () => {
                 showTooltip={true}
                 displayOverlayContent={true}
                 overlayContent={
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-black/60 to-transparent rounded-xl flex flex-col justify-end p-6">
+                  <div className="absolute inset-0 rounded-xl flex flex-col justify-end p-6 [background:linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.2)_32%,transparent_55%)]">
                     <div className="relative z-10">
                       <h3 className="text-2xl font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] mb-3 leading-tight">
                         {service.title}
@@ -94,7 +94,7 @@ const Services = () => {
                                 setExpandedDescriptions(prev => new Set(prev).add(service.id));
                               }
                             }}
-                            className="text-xs text-[#cc9445] hover:text-[#e0a85a] mt-2 font-semibold underline transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                            className="text-xs text-sky-400 hover:text-sky-300 mt-2 font-semibold underline transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
                           >
                             {expandedDescriptions.has(service.id) ? 'Voir moins' : 'Voir plus'}
                           </button>
@@ -110,13 +110,13 @@ const Services = () => {
                             ? service.features 
                             : service.features.slice(0, 3)
                           ).map((feature, index) => (
-                            <Badge key={index} className="text-xs bg-[#cc9445]/30 text-white border-[#cc9445]/50 backdrop-blur-sm font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
+                            <Badge key={index} className="text-xs bg-blue-600/35 text-white border-blue-400/55 backdrop-blur-sm font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
                               {feature}
                             </Badge>
                           ))}
                           {service.features.length > 3 && !expandedFeatures.has(service.id) && (
                             <Badge 
-                              className="text-xs bg-[#cc9445]/30 text-white border-[#cc9445]/50 backdrop-blur-sm cursor-pointer hover:bg-[#cc9445]/40 transition-colors font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
+                              className="text-xs bg-blue-600/35 text-white border-blue-400/55 backdrop-blur-sm cursor-pointer hover:bg-blue-600/45 transition-colors font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpandedFeatures(prev => new Set(prev).add(service.id));
