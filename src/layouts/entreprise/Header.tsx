@@ -31,12 +31,15 @@ const Header = () => {
       <NavBody>
         <NavbarLogo />
         <NavItems items={navItems} />
-        <div className="flex items-center gap-2 md:gap-4">
-          <Link to="/contact">
-            <NavbarButton variant="primary" className="text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2">
-              <Icon icon="solar:phone-calling-line-duotone" className="mr-1 md:mr-2" height={16} width={16} />
-              <span className="hidden sm:inline">Nous contacter</span>
-              <span className="sm:hidden">Contact</span>
+        <div className="flex shrink-0 items-center gap-2 md:gap-4">
+          <Link to="/contact" className="shrink-0">
+            <NavbarButton
+              variant="primary"
+              className="whitespace-nowrap text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2"
+            >
+              <Icon icon="solar:phone-calling-line-duotone" className="mr-1 md:mr-2 shrink-0" height={16} width={16} />
+              <span className="hidden sm:inline whitespace-nowrap">Nous contacter</span>
+              <span className="sm:hidden whitespace-nowrap">Contact</span>
             </NavbarButton>
           </Link>
         </div>
@@ -69,9 +72,9 @@ const Header = () => {
             );
           })}
           <div className="flex w-full flex-col gap-4 pt-2">
-            <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
-              <NavbarButton variant="primary" className="w-full text-sm px-4 py-2.5">
-                <Icon icon="solar:phone-calling-line-duotone" className="mr-2" height={18} width={18} />
+            <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="w-full shrink-0">
+              <NavbarButton variant="primary" className="w-full whitespace-nowrap justify-center text-sm px-4 py-2.5">
+                <Icon icon="solar:phone-calling-line-duotone" className="mr-2 shrink-0" height={18} width={18} />
                 Nous contacter
               </NavbarButton>
             </Link>

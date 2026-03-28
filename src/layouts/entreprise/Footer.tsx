@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { Icon } from '@iconify/react';
-import Logo from '../../components/entreprise/Logo';
+
+const FOOTER_LOGO_SRC = '/images/social-preview-blanc.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -44,7 +45,7 @@ const Footer = () => {
     },
     {
       name: 'LinkedIn',
-      href: 'https://linkedin.com/company/2nbdigital',
+      href: 'https://www.linkedin.com/company/106826437',
       icon: 'logos:linkedin-icon',
     },
     {
@@ -66,7 +67,21 @@ const Footer = () => {
           {/* Logo et description */}
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <div className="mb-4">
-              <Logo />
+              <Link
+                to="/"
+                className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+              >
+                <img
+                  src={FOOTER_LOGO_SRC}
+                  alt="2NB Digital"
+                  className="hidden md:block h-16 md:h-20 w-auto max-w-full object-contain object-left"
+                />
+                <img
+                  src={FOOTER_LOGO_SRC}
+                  alt="2NB Digital"
+                  className="block md:hidden h-8 sm:h-10 w-auto max-w-full object-contain object-left"
+                />
+              </Link>
             </div>
             <p className="text-gray-400 text-sm mb-6">
               Votre partenaire de confiance pour la transformation digitale au Burkina Faso et en Afrique.
