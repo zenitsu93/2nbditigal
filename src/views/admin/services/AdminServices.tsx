@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { Button, Modal, TextInput, Textarea, Label, Badge } from 'flowbite-react';
+import { Modal, TextInput, Textarea, Label, Badge } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Icon } from '@iconify/react';
 import { servicesApi, Service } from '../../../services/api/services';
 import { uploadApi } from '../../../services/api/upload';

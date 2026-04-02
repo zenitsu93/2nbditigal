@@ -1,4 +1,5 @@
-import { Modal, Button } from 'flowbite-react';
+import { Modal } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Icon } from '@iconify/react';
 
 interface ConfirmDialogProps {

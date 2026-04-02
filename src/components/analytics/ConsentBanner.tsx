@@ -6,6 +6,7 @@ import {
   setAnalyticsConsent,
   type AnalyticsConsent,
 } from 'src/lib/analyticsConsent';
+import StarBorder from 'src/components/shared/StarBorder';
 
 const ConsentBanner: FC = () => {
   const location = useLocation();
@@ -64,20 +65,26 @@ const ConsentBanner: FC = () => {
           </div>
 
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <button
+            <StarBorder
               type="button"
-              className="w-full rounded-full border border-dark/10 px-4 py-2.5 text-sm font-medium text-dark hover:bg-dark/5 sm:w-auto"
+              variant="muted"
+              color="#9ca3af"
+              className="w-full sm:w-auto"
+              innerClassName="min-h-10 px-4 py-2.5 text-sm font-medium"
               onClick={() => setAnalyticsConsent('denied')}
             >
               Paramétrer plus tard
-            </button>
-            <button
+            </StarBorder>
+            <StarBorder
               type="button"
-              className="w-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#f5c85c] px-6 py-2.5 text-sm font-semibold text-dark shadow-lg shadow-yellow-500/20 transition hover:brightness-105 sm:w-auto"
+              variant="primary"
+              color="#d4af37"
+              className="w-full sm:w-auto"
+              innerClassName="min-h-10 px-6 py-2.5 text-sm font-semibold"
               onClick={() => setAnalyticsConsent('granted')}
             >
               Tout accepter
-            </button>
+            </StarBorder>
           </div>
         </div>
       </div>

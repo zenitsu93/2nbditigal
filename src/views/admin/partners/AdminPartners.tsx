@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Modal, TextInput, Label } from 'flowbite-react';
+import { Modal, TextInput, Label } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Icon } from '@iconify/react';
 import { partnersApi, Partner } from '../../../services/api/partners';
 import { uploadApi } from '../../../services/api/upload';

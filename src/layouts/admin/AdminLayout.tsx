@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
 import { Icon } from '@iconify/react';
-import { Sidebar, SidebarItem, SidebarItemGroup, SidebarItems, Button } from 'flowbite-react';
+import { Sidebar, SidebarItem, SidebarItemGroup, SidebarItems } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import FullLogo from '../full/shared/logo/FullLogo';
 import { useAuth } from '../../contexts/AuthContext';
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Button } from 'flowbite-react';
+import StarBorder from './StarBorder';
 import { Icon } from '@iconify/react';
 import { promotionsApi, Promotion } from '../../services/api/promotions';
 import SpotlightCard from './SpotlightCard';
@@ -106,7 +106,7 @@ const PromotionModal = () => {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-2 right-2 z-20 text-[#cc9445] hover:text-[#d4af37] transition-colors bg-black/50 rounded-full p-1 shadow-lg hover:bg-black/70"
+              className="absolute top-2 right-2 z-20 text-blue-400 hover:text-blue-300 transition-colors bg-black/50 rounded-full p-1 shadow-lg hover:bg-black/70"
               aria-label="Fermer la promotion"
             >
               <Icon icon="solar:close-circle-bold" className="w-5 h-5" />
@@ -138,7 +138,7 @@ const PromotionModal = () => {
                   <span className="meta inline-flex items-center justify-center text-xs text-gray-400">
                     {promotion.start_date && formatDate(promotion.start_date)}
                     {promotion.start_date && promotion.end_date && (
-                      <span className="separator inline-block w-1 h-1 rounded-full bg-[#cc9445] mx-2" />
+                      <span className="separator inline-block w-1 h-1 rounded-full bg-blue-400 mx-2" />
                     )}
                     {promotion.end_date && formatDate(promotion.end_date)}
                   </span>
@@ -167,23 +167,20 @@ const PromotionModal = () => {
               
               {/* CTA Button - WhatsApp */}
               <div className="flex justify-center">
-                <a
+                <StarBorder
+                  as="a"
                   href={`https://wa.me/22677534419?text=${encodeURIComponent(`Je suis intéressé par ${promotion.title} et je voudrais en savoir plus`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleClose}
+                  variant="primary"
+                  color="#d4af37"
                   className="w-full sm:w-auto"
+                  innerClassName="min-h-9 px-5 py-1.5 text-sm"
                 >
-                  <Button 
-                    color="primary" 
-                    size="sm" 
-                    className="w-full sm:w-auto px-5 py-1.5"
-                    style={{ margin: 'none' }}
-                  >
-                    {promotion.cta_text}
-                    <Icon icon="solar:arrow-right-line-duotone" className="ml-1.5 w-4 h-4" />
-                  </Button>
-                </a>
+                  {promotion.cta_text}
+                  <Icon icon="solar:arrow-right-line-duotone" className="ml-1.5 w-4 h-4" />
+                </StarBorder>
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CardBox from '../../components/shared/CardBox';
-import { Button, Label, TextInput, Textarea, Select } from 'flowbite-react';
+import { Label, TextInput, Textarea, Select } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Icon } from '@iconify/react';
 
 const Contact = () => {

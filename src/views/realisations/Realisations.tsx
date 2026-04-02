@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import CardBox from '../../components/shared/CardBox';
-import { Button, Badge, Pagination } from 'flowbite-react';
+import { Badge, Pagination } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Link } from 'react-router';
 import { projectsApi, Project } from '../../services/api/projects';
 

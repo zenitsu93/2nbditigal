@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Label, TextInput } from 'flowbite-react';
+import { Button } from 'src/components/shared/SiteButton';
 import { Icon } from '@iconify/react';
 import CardBox from '../../../components/shared/CardBox';
 import { configApi } from '../../../services/api/config';
