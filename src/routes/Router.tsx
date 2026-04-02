@@ -1,7 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import  { lazy } from 'react';
-import { Navigate, createBrowserRouter } from "react-router";
+import { Navigate, Outlet, createBrowserRouter } from "react-router";
+import GoogleAnalytics from 'src/components/analytics/GoogleAnalytics';
+import ConsentBanner from 'src/components/analytics/ConsentBanner';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 import ProtectedRoute from 'src/components/admin/ProtectedRoute';
 
@@ -33,7 +35,20 @@ const AdminTestimonials = Loadable(lazy(() => import('../views/admin/testimonial
 const AdminConfig = Loadable(lazy(() => import('../views/admin/config/AdminConfig')));
 const AdminPromotions = Loadable(lazy(() => import('../views/admin/promotions/AdminPromotions')));
 
+function RootLayout() {
+  return (
+    <>
+      <GoogleAnalytics />
+      <ConsentBanner />
+      <Outlet />
+    </>
+  );
+}
+
 const Router = [
+  {
+    element: <RootLayout />,
+    children: [
   {
     path: '/',
     element: <EntrepriseLayout />,
@@ -70,6 +85,8 @@ const Router = [
       { path: '/admin/testimonials', exact: true, element: <AdminTestimonials /> },
       { path: '/admin/config', exact: true, element: <AdminConfig /> },
       { path: '/admin/promotions', exact: true, element: <AdminPromotions /> },
+    ],
+  },
     ],
   },
 ];
