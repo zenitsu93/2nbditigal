@@ -40,7 +40,7 @@ const Services = () => {
     <div className="container mx-auto px-4 py-12">
       {/* Header Section */}
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-3 sm:mb-4">Nos Services</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">Nos Services</h1>
         <p className="text-base sm:text-lg text-dark/70 max-w-3xl mx-auto px-4">
           Nous accompagnons les entreprises dans leur transformation digitale avec une gamme complète de services allant du développement de solutions digitales à la formation, en passant par le conseil stratégique et l'intelligence artificielle.
         </p>
@@ -165,7 +165,7 @@ const Services = () => {
               <Icon icon="solar:question-circle-line-duotone" className="text-4xl text-primary" height={40} />
             </div>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-dark mb-3">Besoin d'aide pour choisir ?</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-primary mb-3">Besoin d'aide pour choisir ?</h2>
           <p className="text-sm sm:text-base text-dark/70 mb-6 max-w-2xl mx-auto px-4">
             Notre équipe d'experts est là pour vous conseiller et vous accompagner dans le choix des services adaptés à vos besoins.
           </p>

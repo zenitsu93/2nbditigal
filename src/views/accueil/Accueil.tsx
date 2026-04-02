@@ -152,7 +152,7 @@ const Accueil = () => {
             <TextType
               text="Votre Partenaire de Confiance pour la Transformation Digitale"
               as="h1"
-              className="text-4xl md:text-5xl font-bold text-dark mb-6"
+              className="text-4xl md:text-5xl font-bold text-primary mb-6"
               typingSpeed={50}
               initialDelay={500}
               pauseDuration={3000}
@@ -161,6 +161,7 @@ const Accueil = () => {
               showCursor={true}
               hideCursorWhileTyping={false}
               cursorCharacter="|"
+              cursorClassName="text-primary"
               cursorBlinkDuration={0.5}
               startOnVisible={true}
             />
@@ -192,7 +193,7 @@ const Accueil = () => {
       <section className="py-10 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-dark mb-4">Nos Services</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Nos Services</h2>
             <p className="text-dark/70 max-w-2xl mx-auto">
               Une gamme complète de services pour répondre à tous vos besoins en transformation digitale
             </p>
@@ -274,7 +275,7 @@ const Accueil = () => {
       <section id="faq" className="py-10 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-dark mb-4">Questions Fréquentes</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Questions Fréquentes</h2>
             <p className="text-dark/70 max-w-2xl mx-auto">
               Trouvez rapidement les réponses à vos questions sur nos services, nos projets et notre accompagnement.
             </p>
@@ -299,7 +300,7 @@ const Accueil = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-dark mb-4">Nos Partenaires</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Nos Partenaires</h2>
             <p className="text-dark/70 max-w-2xl mx-auto">
               Nous collaborons avec des entreprises de confiance pour vous offrir les meilleures solutions.
             </p>

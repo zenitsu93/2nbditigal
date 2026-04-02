@@ -81,7 +81,7 @@ Merci de me recontacter.`;
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-2xl sm:text-4xl font-bold text-dark mb-3 sm:mb-4">Contactez-Nous</h1>
+        <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-3 sm:mb-4">Contactez-Nous</h1>
         <p className="text-base sm:text-lg text-dark/70 max-w-2xl mx-auto px-4">
           Une question ? Un projet ? Notre équipe est à votre écoute pour vous accompagner dans votre transformation digitale.
         </p>

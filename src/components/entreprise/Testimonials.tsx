@@ -86,7 +86,7 @@ const Testimonials = () => {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Ce Que Disent Nos Clients</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Ce Que Disent Nos Clients</h2>
           <p className="text-dark/70 max-w-2xl mx-auto text-lg">
             Découvrez les témoignages de nos clients qui nous font confiance pour leur transformation digitale
           </p>

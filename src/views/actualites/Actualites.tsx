@@ -50,7 +50,7 @@ const Actualites = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-dark mb-2">Actualités & Blog</h2>
+        <h2 className="text-2xl font-semibold text-primary mb-2">Actualités & Blog</h2>
         <p className="text-dark/70">
           Restez informé des dernières actualités, tendances et conseils dans le domaine du développement et du design.
         </p>
