@@ -30,7 +30,11 @@ export function initGtag(measurementId: string): void {
 
 export function sendPageView(path: string): void {
   if (!GA_MEASUREMENT_ID || !window.gtag) return;
-  window.gtag('config', GA_MEASUREMENT_ID, {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
+  window.gtag('event', 'page_view', {
     page_path: path,
+    page_title: document.title,
+    page_location: window.location.href,
   });
 }
