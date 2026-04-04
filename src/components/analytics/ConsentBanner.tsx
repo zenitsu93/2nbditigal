@@ -1,91 +1,52 @@
-import { FC, useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
+import { FC, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 import {
-  CONSENT_EVENT,
   getAnalyticsConsent,
   setAnalyticsConsent,
   type AnalyticsConsent,
 } from 'src/lib/analyticsConsent';
-import StarBorder from 'src/components/shared/StarBorder';
 
 const ConsentBanner: FC = () => {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
   const [consent, setConsent] = useState<AnalyticsConsent>(() => getAnalyticsConsent());
 
-  useEffect(() => {
-    const handler = () => setConsent(getAnalyticsConsent());
-    window.addEventListener(CONSENT_EVENT, handler);
-    return () => window.removeEventListener(CONSENT_EVENT, handler);
-  }, []);
-
-  const isAdminRoute = location.pathname.startsWith('/admin');
   const visible = consent === 'unknown' && !isAdminRoute;
-
   if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-xl rounded-2xl bg-white shadow-2xl">
-        <div className="flex flex-col gap-4 p-6 sm:p-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="h-10 w-auto">
-              <img
-                src="/images/social-preview.png"
-                alt="2NB Digital"
-                className="h-full w-auto"
-                loading="lazy"
-              />
-            </div>
-
-            <button
-              type="button"
-              className="text-xs font-medium text-dark/60 underline underline-offset-4 hover:text-dark"
-              onClick={() => setAnalyticsConsent('denied')}
-            >
-              Continuer sans accepter
-            </button>
-          </div>
-
-          <div className="space-y-3 text-sm leading-relaxed text-dark/75">
-            <p className="font-semibold text-dark">
-              Nous utilisons des cookies analytiques pour mesurer l’audience de notre site et améliorer
-              nos services.
-            </p>
-            <p>
-              Aucune donnée sensible n’est collectée. Vous pouvez à tout moment revenir sur votre choix
-              dans notre{' '}
-              <a
-                href="/privacy"
-                className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"
-              >
-                politique de confidentialité
-              </a>
-              .
-            </p>
-          </div>
-
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <StarBorder
-              type="button"
-              variant="muted"
-              color="#9ca3af"
-              className="w-full sm:w-auto"
-              innerClassName="min-h-10 px-4 py-2.5 text-sm font-medium"
-              onClick={() => setAnalyticsConsent('denied')}
-            >
-              Paramétrer plus tard
-            </StarBorder>
-            <StarBorder
-              type="button"
-              variant="primary"
-              color="#d4af37"
-              className="w-full sm:w-auto"
-              innerClassName="min-h-10 px-6 py-2.5 text-sm font-semibold"
-              onClick={() => setAnalyticsConsent('granted')}
-            >
-              Tout accepter
-            </StarBorder>
-          </div>
+      <div className="mx-4 w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
+        <h2 className="text-lg font-semibold text-dark">Cookies et mesure d&apos;audience</h2>
+        <p className="mt-3 text-sm leading-relaxed text-dark/75">
+          Nous utilisons des cookies pour mesurer l&apos;audience et améliorer le site. Vous pouvez
+          accepter ou refuser les cookies analytiques.{' '}
+          <Link to="/privacy" className="text-primary font-medium underline hover:no-underline">
+            Politique de confidentialité
+          </Link>
+          .
+        </p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            className="order-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 sm:order-1"
+            onClick={() => {
+              setAnalyticsConsent('denied');
+              setConsent('denied');
+            }}
+          >
+            Refuser
+          </button>
+          <button
+            type="button"
+            className="order-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 sm:order-2"
+            onClick={() => {
+              setAnalyticsConsent('granted');
+              setConsent('granted');
+            }}
+          >
+            Accepter
+          </button>
         </div>
       </div>
     </div>
@@ -93,4 +54,3 @@ const ConsentBanner: FC = () => {
 };
 
 export default ConsentBanner;
-

@@ -35,4 +35,3 @@ export function setAnalyticsConsent(consent: 'granted' | 'denied'): void {
   ls.setItem(KEY, consent);
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: { consent } }));
 }
-

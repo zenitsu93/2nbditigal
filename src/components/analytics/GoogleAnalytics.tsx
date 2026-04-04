@@ -5,7 +5,7 @@ import { CONSENT_EVENT, isAnalyticsAllowed } from 'src/lib/analyticsConsent';
 
 /**
  * GA4 : charge gtag une fois et envoie un page_view à chaque navigation (SPA).
- * Désactivé si VITE_GA_MEASUREMENT_ID est absent.
+ * Désactivé si VITE_GA_MEASUREMENT_ID est absent ou si l’utilisateur n’a pas accepté les cookies analytics.
  */
 const GoogleAnalytics: FC = () => {
   const location = useLocation();

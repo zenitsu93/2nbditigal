@@ -30,8 +30,7 @@ export function initGtag(measurementId: string): void {
 
 export function sendPageView(path: string): void {
   if (!GA_MEASUREMENT_ID || !window.gtag) return;
-  if (typeof document === 'undefined' || typeof window === 'undefined') return;
-
+  // GA4 : préférer l’événement page_view (un second `config` + page_path n’envoie pas toujours de hit collect).
   window.gtag('event', 'page_view', {
     page_path: path,
     page_title: document.title,
