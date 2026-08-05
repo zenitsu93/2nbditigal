@@ -155,6 +155,71 @@
     @apply !cursor-pointer;
   }
 
+  .prose {
+    max-width: none;
+    color: rgb(64 64 64);
+    line-height: 1.8;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply text-dark dark:text-white font-semibold;
+  }
+
+  .legal-prose {
+    max-width: none;
+  }
+
+  .legal-prose h1 {
+    @apply text-4xl mb-10;
+  }
+
+  .legal-prose h2 {
+    @apply text-2xl mt-10 mb-5;
+  }
+
+  .legal-prose h2::before {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 3px;
+    background: #d1a84b;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+
+  .legal-prose p {
+    @apply mb-5 text-dark/70;
+  }
+
+  .legal-prose a {
+    @apply text-primary no-underline hover:underline;
+  }
+
+  .legal-prose ul {
+    @apply list-disc ml-6 mb-5;
+  }
+
+  .legal-prose li {
+    @apply mb-3;
+  }
+
+  .legal-prose ul li::marker {
+    color: #d1a84b;
+  }
+
+  .legal-prose strong {
+    @apply text-dark font-semibold;
+  }
+
+  .legal-prose hr {
+    @apply border-gray-300 my-8;
+  }
+
   /*heading text color*/
   h1,
   h2,
