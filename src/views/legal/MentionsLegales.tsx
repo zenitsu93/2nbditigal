@@ -9,9 +9,12 @@ const MentionsLegales = () => {
         <Card className="mb-6">
           <h2 className="text-2xl font-semibold text-dark mb-4">1. Informations sur l'entreprise</h2>
           <div className="space-y-3 text-dark/70">
-            <p><strong className="text-dark">Raison sociale :</strong> 2NB Digital</p>
-            <p><strong className="text-dark">Forme juridique :</strong> Société</p>
-            <p><strong className="text-dark">Siège social :</strong> Burkina Faso</p>
+            <p><strong className="text-dark">Raison sociale :</strong> 2NB DIGITAL</p>
+            <p><strong className="text-dark">Forme juridique :</strong> Société à Responsabilité Limitée (SARL)</p>
+            <p><strong className="text-dark">Capital social :</strong> 1 000 000 FCFA</p>
+            <p><strong className="text-dark">Siège social :</strong> 08 BP 885 OUAGA 08, Ouagadougou, Burkina Faso</p>
+            <p><strong className="text-dark">RCCM :</strong> BF-OUA-01-2026-B12-12996</p>
+            <p><strong className="text-dark">IFU :</strong> 00319189K</p>
             <p><strong className="text-dark">Email :</strong> contact@2nbdigital.com</p>
             <p><strong className="text-dark">Téléphone :</strong> +226 77 53 44 19</p>
             <p><strong className="text-dark">Site web :</strong> www.2nbdigital.com</p>
@@ -21,14 +24,14 @@ const MentionsLegales = () => {
         <Card className="mb-6">
           <h2 className="text-2xl font-semibold text-dark mb-4">2. Directeur de publication</h2>
           <p className="text-dark/70">
-            Le directeur de la publication est le représentant légal de 2NB Digital.
+            Le directeur de la publication est le représentant légal de 2NB Digital, Monsieur Christian Thomas Badolo.
           </p>
         </Card>
 
         <Card className="mb-6">
           <h2 className="text-2xl font-semibold text-dark mb-4">3. Hébergement</h2>
           <p className="text-dark/70">
-            Ce site est hébergé par un prestataire technique. Pour toute information concernant l'hébergement, 
+            Ce site est hébergé par un prestataire technique. Pour toute information concernant l'hébergement,
             veuillez nous contacter à l'adresse indiquée ci-dessus.
           </p>
         </Card>
@@ -53,7 +56,7 @@ const MentionsLegales = () => {
           <p className="text-dark/70">
             Conformément à la loi relative à la protection des données personnelles, vous disposez d'un droit 
             d'accès, de rectification et de suppression des données vous concernant. Pour exercer ce droit, 
-            vous pouvez nous contacter à l'adresse : contact@2nbdigital.com
+            vous pouvez nous contacter à l'adresse : contact@2nbdigital.com.
           </p>
         </Card>
 
