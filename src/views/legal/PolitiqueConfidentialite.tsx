@@ -1,9 +1,11 @@
 const PolitiqueConfidentialite = () => {
+  const derniereMiseAJour = '5 août 2026';
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <article className="prose legal-prose max-w-none">
-          <h1 className="text-center">Politique de Confidentialité</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-3 sm:mb-4 text-center">Politique de Confidentialité</h1>
 
           <h2>1. Introduction</h2>
           <p>
@@ -111,9 +113,7 @@ const PolitiqueConfidentialite = () => {
 
           <hr />
 
-          <p>
-            Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
+          <p>Dernière mise à jour : {derniereMiseAJour}</p>
         </article>
       </div>
     </div>
